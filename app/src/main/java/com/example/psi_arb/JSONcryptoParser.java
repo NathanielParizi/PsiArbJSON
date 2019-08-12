@@ -41,7 +41,7 @@ public class JSONcryptoParser {
         PairCache exchangeRates = new PairCache();
         JSONObject exchangeRateJsonObject = new JSONObject(url);
         JSONArray resultJsonArray = exchangeRateJsonObject.getJSONArray("result");
-        JSONObject pairObject = resultJsonArray.getJSONObject(125);
+        JSONObject pairObject = resultJsonArray.getJSONObject(100);
       /*  for(int i =0; i < 300; i++){
             JSONObject pairObject = resultJsonArray.getJSONObject(i);
             if(pairObject.get("MarketName").equals(myPair)){
@@ -55,7 +55,7 @@ public class JSONcryptoParser {
                 exchangeRates.setBid(getString("Bid", pairObject));
                 exchangeRates.setAsk(getString("Ask", pairObject));
                 exchangeRates.setPair(getString("MarketName", pairObject));
-                System.out.println("**************** parse " + 125 + getString("MarketName",pairObject));
+                System.out.println("**************** parse " + 100 + getString("MarketName",pairObject));
 
             //}
         //}

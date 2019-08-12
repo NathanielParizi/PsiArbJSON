@@ -5,25 +5,26 @@ import java.math.BigDecimal;
 public class ExchangeRateStorage {
 
     private static BigDecimal bid;
+    private static BigDecimal ask;
 
     public ExchangeRateStorage() {
     }
 
-    public static BigDecimal getBid() {
-        return bid;
+    public BigDecimal getBid() {
+        return this.bid;
     }
 
-    public static void setBid(BigDecimal bid) {
-        ExchangeRateStorage.bid = bid;
+    public void setBid(BigDecimal bid) {
+        this.bid = bid;
     }
 
-    public static BigDecimal getAsk() {
-        return ask;
+    public BigDecimal getAsk() {
+        return this.ask;
     }
 
-    public static void setAsk(BigDecimal ask) {
-        ExchangeRateStorage.ask = ask;
+    public void setAsk(BigDecimal ask) {
+        this.ask = ask;
     }
 
-    private static BigDecimal ask;
+
 }

@@ -12,7 +12,7 @@ import java.net.URL;
 
 public class HTTPCrpytoClient {
 
-    private static String BASE_URL = "https://api.bittrex.com/api/v1.1/public/getmarketsummaries";
+    private static String BASE_URL = "https://api.bitfinex.com/v1/pubticker/ethusd";
 
 
     public String getData(){
@@ -31,7 +31,6 @@ public class HTTPCrpytoClient {
             httpURLConnection.connect();
 
 
-            System.out.println("YES****************************");
             //Read the Response
             StringBuffer stringBuffer = new StringBuffer();
             inputStream = httpURLConnection.getInputStream();
