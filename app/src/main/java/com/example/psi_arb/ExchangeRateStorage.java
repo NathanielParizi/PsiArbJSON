@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 
 public class ExchangeRateStorage {
 
-    private static BigDecimal bid;
-    private static BigDecimal ask;
+    private  BigDecimal bid;
+    private  BigDecimal ask;
 
     public ExchangeRateStorage() {
     }

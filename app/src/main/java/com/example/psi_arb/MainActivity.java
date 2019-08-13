@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
         btn = (Button) findViewById(R.id.btn);
 
         getCryptoPair();
-//        getCryptoPair("ETHEUR");
+//       getCryptoPair("ETHEUR");
 //        getCryptoPair("ETHBTC");
 //        getCryptoPair("BTCUSD");
 //        getCryptoPair("BTCEUR");
@@ -153,12 +153,10 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
 
-                System.out.println(ETHUSD_bitfinex.getBid() + "\n" + ETHEUR_bitfinex.getBid() + "\n" + ETHBTC_bitfinex.getBid() +
-                        "\n" + BTCUSD_bitfinex.getBid() + "\n" + BTCEUR_bitfinex.getBid() + "\n" + XMRBTC_bitfinex.getBid() + "\n" + XRPUSD_bitfinex.getBid() + "\n" +
-                        XRPEUR_bitfinex.getBid() + "\n" + XRPBTC_bitfinex.getBid() + "\n" + BABUSD_bitfinex.getBid() + "\n" + BABEUR_bitfinex.getBid());
-                String comeON = (ETHUSD_bitfinex.getBid() + "\n" + ETHEUR_bitfinex.getBid() + "\n" + ETHBTC_bitfinex.getBid() +
-                        "\n" + BTCUSD_bitfinex.getBid() + "\n" + BTCEUR_bitfinex.getBid() + "\n" + XMRBTC_bitfinex.getBid() + "\n" + XRPUSD_bitfinex.getBid() + "\n" +
-                        XRPEUR_bitfinex.getBid() + "\n" + XRPBTC_bitfinex.getBid() + "\n" + BABUSD_bitfinex.getBid() + "\n" + BABEUR_bitfinex.getBid()).toString();
+//                System.out.println(ETHUSD_bitfinex.getBid() + "\n" + ETHEUR_bitfinex.getBid() + "\n" + ETHBTC_bitfinex.getBid() +
+//                        "\n" + BTCUSD_bitfinex.getBid() + "\n" + BTCEUR_bitfinex.getBid() + "\n" + XMRBTC_bitfinex.getBid() + "\n" + XRPUSD_bitfinex.getBid() + "\n" +
+//                        XRPEUR_bitfinex.getBid() + "\n" + XRPBTC_bitfinex.getBid() + "\n" + BABUSD_bitfinex.getBid() + "\n" + BABEUR_bitfinex.getBid());
+                String comeON = (ETHUSD_bitfinex.getBid().toString() + "... " + ETHBTC_bitfinex.getBid().toString());
 
 
                 pair.setText(comeON);
@@ -177,7 +175,6 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(JSONObject response) {
 
                 try {
-
                     response.getString("bid");   // Test
                     updateBitfinexPair("ETHUSD", response);
 
@@ -195,8 +192,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        queue.add(arrayRequestETHUSD);
 
+        queue.add(arrayRequestETHUSD);
 
 
     }
@@ -214,7 +211,14 @@ public class MainActivity extends AppCompatActivity {
                 case "ETHUSD":
                     ETHUSD_bitfinex.setBid(getMyBigDeci(response.getString("bid")));
                     ETHUSD_bitfinex.setAsk(getMyBigDeci(response.getString("ask")));
-                    Toast.makeText(getApplicationContext(),"WHAT THE HELL",Toast.LENGTH_LONG).show();
+                    
+//                    Toast.makeText(getApplicationContext(), "BigDeci" + str + " " + " BID:" + ETHUSD_bitfinex.getBid(), Toast.LENGTH_LONG).show();
+//                    Toast.makeText(getApplicationContext(), "BigDeci" + str + " " + " ASK:" + ETHUSD_bitfinex.getAsk(), Toast.LENGTH_LONG).show();
+                    break;
+                case "ETHEUR":
+                    ETHEUR_bitfinex.setBid(getMyBigDeci(response.getString("bid")));
+                    ETHEUR_bitfinex.setAsk(getMyBigDeci(response.getString("ask")));
+
 //                    Toast.makeText(getApplicationContext(), "BigDeci" + str + " " + " BID:" + ETHUSD_bitfinex.getBid(), Toast.LENGTH_LONG).show();
 //                    Toast.makeText(getApplicationContext(), "BigDeci" + str + " " + " ASK:" + ETHUSD_bitfinex.getAsk(), Toast.LENGTH_LONG).show();
                     break;
