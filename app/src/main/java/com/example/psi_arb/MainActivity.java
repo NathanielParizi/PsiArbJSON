@@ -56,7 +56,7 @@ import static com.android.volley.Request.*;
 //
 //      The arsenal:
 //
-// ETHUSD //ETHXBT //BTCUSD  //BTCEUR //XMRXBT //XRPUSD //XRPEUR //XRPXBT //BABUSD //BABEUR
+// ETHUSD //ETHXBT //BTCUSD //BTCEUR //XMRXBT //XRPUSD //XRPXBT //BABUSD //BABEUR
 //
 //********************************************************************************************
 
@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private static TextView exRate;
     private static TextView pair;
 
-    private static final String TAG = "TAG";
+    private static final String TAG = "";
     TextView text;
     Button btn;
     private double bid1 = 0;
@@ -87,6 +87,14 @@ public class MainActivity extends AppCompatActivity {
     private static String tempPair;
 
 
+    //***************************************************************
+    //===========Instance variables of currency pairs================
+    // Each object stores a bid and ask price of type BigDecimal.
+    // Naming convention is important here, the triangular arbitrage
+    // module matches base currency and quote currency in order to
+    // calculate the arbitrage.
+    //***************************************************************
+
     //Poloniex
 //
 //    ExchangeRateStorage ETHUSD_poloniex = new ExchangeRateStorage();
@@ -97,20 +105,16 @@ public class MainActivity extends AppCompatActivity {
 //    ExchangeRateStorage XMRBTC_poloniex = new ExchangeRateStorage();
 //    ExchangeRateStorage XRPBTC_poloniex = new ExchangeRateStorage();
 
-    //Bitfinex
+    //Bitfinex  8 Pairs
 
     ExchangeRateStorage BTCUSD_bitfinex = new ExchangeRateStorage();
     ExchangeRateStorage BTCEUR_bitfinex = new ExchangeRateStorage();
     ExchangeRateStorage ETHBTC_bitfinex = new ExchangeRateStorage();
     ExchangeRateStorage XRPBTC_bitfinex = new ExchangeRateStorage();
     ExchangeRateStorage ETHUSD_bitfinex = new ExchangeRateStorage();
-
+    ExchangeRateStorage ETCBTC_bitfinex = new ExchangeRateStorage();
     ExchangeRateStorage XMRBTC_bitfinex = new ExchangeRateStorage();
-    ExchangeRateStorage XMRUSD_bitfinex = new ExchangeRateStorage();
     ExchangeRateStorage XRPUSD_bitfinex = new ExchangeRateStorage();
-    ExchangeRateStorage XRPEUR_bitfinex = new ExchangeRateStorage();
-    ExchangeRateStorage BABUSD_bitfinex = new ExchangeRateStorage();
-    ExchangeRateStorage BABEUR_bitfinex = new ExchangeRateStorage();
 
 
     // ================================================  TOTAL PAIRS   45
@@ -122,6 +126,18 @@ public class MainActivity extends AppCompatActivity {
     static int z = 0;
     private static int pairCounter = 0;
     private static ArrayList<String> cPair = new ArrayList<>();
+
+    //**************** Instruments with BID and ASK prices
+
+    private static String[] bitfinexPair = new String[1000];
+    private static BigDecimal[] bitfinexxBid = new BigDecimal[1000];
+    private static BigDecimal[] bitfinexAsk = new BigDecimal[1000];
+    private static BigDecimal[] bitfinexVolume = new BigDecimal[1000];
+
+    private static String[] bittrexPair = new String[1000];
+    private static BigDecimal[] bittrexBid = new BigDecimal[1000];
+    private static BigDecimal[] bittrexAsk = new BigDecimal[1000];
+    private static BigDecimal[] bittrexVolume = new BigDecimal[1000];
 
 
     @Override
@@ -137,16 +153,14 @@ public class MainActivity extends AppCompatActivity {
         btn = (Button) findViewById(R.id.btn);
 
         cPair.add("ETHUSD");
-
+        cPair.add("ETCBTC");
         cPair.add("BTCUSD");
         cPair.add("BTCEUR");
         cPair.add("ETHBTC");
         cPair.add("XMRBTC");
         cPair.add("XRPUSD");
-        cPair.add("XRPEUR");
         cPair.add("XRPBTC");
-        cPair.add("BABUSD");
-        cPair.add("BABEUR");
+
         cPair.add(" ");
         pair.setText(cPair.get(0));
 
@@ -168,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
 
         RequestQueue queue = Volley.newRequestQueue(this);
 
-
+        //Bitfinex ************************
         String URL = "https://api-pub.bitfinex.com/v2/tickers?symbols=ALL";
         JsonArrayRequest jsonArr_bitfinex = new JsonArrayRequest(Request.Method.GET, URL, null, new Response.Listener<JSONArray>() {
 
@@ -188,11 +202,14 @@ public class MainActivity extends AppCompatActivity {
                         String pairInside = innerArr.getString(0);
                         BigDecimal bidBD = new BigDecimal(innerArr.getString(1));
                         BigDecimal askBD = new BigDecimal(innerArr.getString(3));
-                        BigDecimal spread = new BigDecimal(0);
 
-                        updateBitfinexPair(pairInside, bidBD, askBD);
+                        bitfinexxBid[i] = BigDecimal.valueOf(Double.parseDouble(innerArr.getString(1)));
+                        bitfinexAsk[i] = BigDecimal.valueOf(Double.parseDouble(innerArr.getString(3)));
+                        bitfinexVolume[i] = BigDecimal.valueOf(Double.parseDouble(innerArr.getString(8)));
+                        bitfinexPair[i] = innerArr.getString(0);
 
-                        Log.d("Pair: ", pairInside + " " + askBD + " " + bidBD);
+
+                        Log.d("BITFINEX", bitfinexPair[i] + " " + bitfinexxBid[i].toString() + " " + bitfinexAsk[i].toString() + " " + bitfinexVolume[i].toString());
 
                         //    Log.d("Items: ", jArr.getString(i));
 
@@ -212,31 +229,72 @@ public class MainActivity extends AppCompatActivity {
         });
         queue.add(jsonArr_bitfinex);
 
+        URL = "https://api.bittrex.com/api/v1.1/public/getmarketsummaries";
+        JsonObjectRequest bittrexObject = new JsonObjectRequest(Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+
+                try {
+
+                    JSONArray metadataArr = response.getJSONArray("result");
+
+
+                    for (int i = 0; i < metadataArr.length(); i++) {
+
+                        JSONObject obj = metadataArr.getJSONObject(i);
+
+                        bittrexBid[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("Bid")));
+                        bittrexAsk[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("Ask")));
+                        bittrexVolume[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("BaseVolume")));
+                        bittrexPair[i] = obj.getString("MarketName");
+
+                        Log.d("OK", bittrexVolume[i].toString());
+
+
+                    }
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Log.d("HELLO Object", response.toString());
+                //   JSONObject metadata = response.getJSONObject("result");
+                //    Log.d("HELLO Metadata" , metadata.getString("result"));
+                //              JSONArray array = response.getJSONArray(result);
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
 
         populateWiget();
 
+        queue.add(bittrexObject);
 
     }
 
     private void populateWiget() {
 
-     //   Log.d("ETHUSD", ETHUSD_bitfinex.getBid().toString());
+        //   Log.d("ETHUSD", ETHUSD_bitfinex.getBid().toString());
 
         try {
 
-            String comeON = (ETHUSD_bitfinex.getBid().toString() + " \n"
+            String testString = (ETHUSD_bitfinex.getBid().toString()
 
-                    //+ "\n" + BTCUSD_bitfinex.getBid().toString() + "\n" + BTCEUR_bitfinex.getBid().toString() + "\n"
-//                            + ETHBTC_bitfinex.getBid().toString() + "\n" + XMRBTC_bitfinex.getBid().toString() + "\n"
-//                            + XRPUSD_bitfinex.getBid().toString() + "\n" + XRPEUR_bitfinex.getBid().toString() + "\n"
-//                            + XRPBTC_bitfinex.getBid().toString() + "\n" + BABEUR_bitfinex.getBid().toString() + "\n"
+                    + "\n" + BTCUSD_bitfinex.getBid().toString() + "\n" + BTCEUR_bitfinex.getBid().toString() + "\n"
+                    + ETHBTC_bitfinex.getBid().toString() + "\n" + XMRBTC_bitfinex.getBid().toString() + "\n"
+                    + XRPUSD_bitfinex.getBid().toString() + "\n"
+                    + XRPBTC_bitfinex.getBid().toString() + "\n" + ETCBTC_bitfinex.getBid().toString() + "\n"
 //                            + BABUSD_bitfinex.getBid().toString()
 //
-
             );
 
-            Log.d("Good", comeON);
-            pair.setText(comeON);
+            Log.d("Good", testString);
+            pair.setText(testString);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -245,56 +303,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void updateBitfinexPair(String str, BigDecimal bid, BigDecimal ask) {
-
-        // This entire method parses the BID/ASK JSON from Bitfinex API
-
-        Log.d("update method: pair: ", str);
-
-        switch (str) {
-
-            case "tETHUSD":
-
-                ETHUSD_bitfinex.setBid(bid);
-                ETHUSD_bitfinex.setAsk(ask);
-                break;
-            case "tBTCUSD":
-                BTCUSD_bitfinex.setBid(bid);
-                BTCUSD_bitfinex.setAsk(ask);
-                break;
-            case "tBTCEUR":
-                BTCEUR_bitfinex.setBid(bid);
-                BTCEUR_bitfinex.setAsk(ask);
-                break;
-            case "tETHBTC":
-                ETHBTC_bitfinex.setBid(bid);
-                ETHBTC_bitfinex.setAsk(ask);
-                break;
-            case "tXMRBTC":
-                XMRBTC_bitfinex.setBid(bid);
-                XMRBTC_bitfinex.setAsk(ask);
-                break;
-            case "tXRPUSD":
-                XRPUSD_bitfinex.setBid(bid);
-                XRPUSD_bitfinex.setAsk(ask);
-                break;
-            case "tXRPEUR":
-                XRPEUR_bitfinex.setBid(bid);
-                XRPEUR_bitfinex.setAsk(ask);
-                break;
-            case "tBABUSD":
-                BABUSD_bitfinex.setBid(bid);
-                BABUSD_bitfinex.setAsk(ask);
-                break;
-            case "tBABEUR":
-                BABEUR_bitfinex.setBid(bid);
-                BABEUR_bitfinex.setAsk(ask);
-                break;
-        }
-
-
-    }
-
+   
     private BigDecimal getMyBigDeci(String str) {
 
         BigDecimal b;
