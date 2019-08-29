@@ -55,7 +55,6 @@ import static com.android.volley.Request.*;
 //  exchanges in order to capture arbitrage profit between digital assets.
 //
 
-
 public class MainActivity extends AppCompatActivity {
 
     private static TextView exRate;
@@ -82,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static String tempPair;
 
-
     //***************************************************************
     //===========Instance variables of currency pairs================
     // Each object stores a bid and ask price of type BigDecimal.
@@ -90,30 +88,6 @@ public class MainActivity extends AppCompatActivity {
     // module matches base currency and quote currency in order to
     // calculate the arbitrage.
     //***************************************************************
-
-    //Poloniex
-//
-//    ExchangeRateStorage ETHUSD_poloniex = new ExchangeRateStorage();
-//    ExchangeRateStorage ETHBTC_poloniex = new ExchangeRateStorage();
-//    ExchangeRateStorage BTCUSD_poloniex = new ExchangeRateStorage();
-//    ExchangeRateStorage XRPUSD_poloniex = new ExchangeRateStorage();
-//    ExchangeRateStorage XMRUSD_poloniex = new ExchangeRateStorage();
-//    ExchangeRateStorage XMRBTC_poloniex = new ExchangeRateStorage();
-//    ExchangeRateStorage XRPBTC_poloniex = new ExchangeRateStorage();
-
-    //Bitfinex  8 Pairs
-
-    ExchangeRateStorage BTCUSD_bitfinex = new ExchangeRateStorage();
-    ExchangeRateStorage BTCEUR_bitfinex = new ExchangeRateStorage();
-    ExchangeRateStorage ETHBTC_bitfinex = new ExchangeRateStorage();
-    ExchangeRateStorage XRPBTC_bitfinex = new ExchangeRateStorage();
-    ExchangeRateStorage ETHUSD_bitfinex = new ExchangeRateStorage();
-    ExchangeRateStorage ETCBTC_bitfinex = new ExchangeRateStorage();
-    ExchangeRateStorage XMRBTC_bitfinex = new ExchangeRateStorage();
-    ExchangeRateStorage XRPUSD_bitfinex = new ExchangeRateStorage();
-
-
-    // ================================================  TOTAL PAIRS   45
 
 
     static String c1;
@@ -166,15 +140,6 @@ public class MainActivity extends AppCompatActivity {
         exRate = (TextView) findViewById(R.id.rate);
         pair = (TextView) findViewById(R.id.pair);
         btn = (Button) findViewById(R.id.btn);
-
-        cPair.add("ETHUSD");
-        cPair.add("ETCBTC");
-        cPair.add("BTCUSD");
-        cPair.add("BTCEUR");
-        cPair.add("ETHBTC");
-        cPair.add("XMRBTC");
-        cPair.add("XRPUSD");
-        cPair.add("XRPBTC");
 
         cPair.add(" ");
         pair.setText(cPair.get(0));
@@ -366,7 +331,6 @@ public class MainActivity extends AppCompatActivity {
 
         queue.add(okexFeed);
 
-
         URL = "https://api.kraken.com/0/public/Ticker?pair=BCHEUR,BCHUSD,BCHXBT,DASHEUR,DASHUSD,DASHXBT,EOSETH,EOSXBT,GNOETH,GNOXBT,USDTZUSD,XETCXETH,XETCXXBT,XETCZEUR,XETCZUSD,XETHXXBT,XETHZGBP,XETHZJPY,XETHZUSD,XICNXETH,XICNXXBT,XLTCXXBT,XLTCZEUR,XLTCZUSD,XMLNXETH,XMLNXXBT,XREPXETH,XREPXXBT,XREPZEUR,XXBTZCAD,XXBTZEUR,XXBTZGBP,XXBTZJPY,XXBTZUSD,XXDGXXBT,XXLMXXBT,XXMRXXBT,XXMRZEUR,XXMRZUSD,XXRPXXBT,XXRPZEUR,XXRPZUSD,XZECXXBT,XZECZEUR,XZECZUSD";
 
         JsonObjectRequest krakenFeed = new JsonObjectRequest(Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
@@ -398,7 +362,6 @@ public class MainActivity extends AppCompatActivity {
                         JSONArray bidArr = innerObj.getJSONArray("b");
                         String kask = askArr.getString(0);
                         String kbid = bidArr.getString(0);
-
 
                         krakenAsk[krakenCountprice] = BigDecimal.valueOf(Double.parseDouble(kask));
                         krakenBid[krakenCountprice] = BigDecimal.valueOf(Double.parseDouble(kbid));
@@ -433,7 +396,6 @@ public class MainActivity extends AppCompatActivity {
                 int poloniexCounter = 0;
 
 
-
                 while (keys.hasNext()) {
 
                     String here = (String) keys.next();
@@ -457,8 +419,6 @@ public class MainActivity extends AppCompatActivity {
                 }
 
 
-
-
             }
         }, new Response.ErrorListener() {
             @Override
@@ -468,14 +428,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         queue.add(poloniexFeed);
-
-        populateWiget();
-
-
-    }
-
-
-    private void populateWiget() {
 
 
     }
@@ -489,72 +441,5 @@ public class MainActivity extends AppCompatActivity {
 
         return b;
     }
-
-
-/*
-    private class JSONparseTask extends AsyncTask<String, Void, PairCache> {
-
-        Context context;
-
-        public JSONparseTask(Context context) {
-            this.context = context;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-        }
-
-        @Override
-        protected void onPostExecute(PairCache pairCache) {
-            super.onPostExecute(pairCache);
-
-            BigDecimal bigD;
-
-            // bigD = getMyBigDeci(pairCache);
-
-            Toast.makeText(MainActivity.this, (CharSequence) pairCache, Toast.LENGTH_LONG).show();
-            //    ETHBTC_bitfinex.setBid(bigD);
-            System.out.println(ETHBTC_bitfinex.getBid());
-
-            // exRate.setText(bigD.toString());
-            // pair.setText(pairCache.getPair());
-
-        }
-
-        private BigDecimal getMyBigDeci(PairCache pairCache) {
-
-            BigDecimal b;
-
-            String k = pairCache.getBid();
-            Double.parseDouble(k);
-            b = new BigDecimal(k, MathContext.DECIMAL64);
-
-            return b;
-        }
-
-        @Override
-        protected PairCache doInBackground(String... strings) {
-
-            PairCache cryptoStuff = new PairCache();
-            String data = ((new HTTPCrpytoClient()).getData());
-            System.out.println("****SUCCESS *****" + data);
-
-            String myPair = "BTC-ETH";
-
-
-            try {
-                cryptoStuff = JSONcryptoParser.getExchangeRates(data, myPair);
-
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
-
-            return cryptoStuff;
-        }
-    }
-
-    */
 
 }
