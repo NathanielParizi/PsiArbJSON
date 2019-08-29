@@ -29,11 +29,13 @@ import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 
 import static com.android.volley.Request.*;
 
@@ -52,13 +54,7 @@ import static com.android.volley.Request.*;
 //  This algorithm will demonstrate automated order execution accross crypto-
 //  exchanges in order to capture arbitrage profit between digital assets.
 //
-//********************************************************************************************
-//
-//      The arsenal:
-//
-// ETHUSD //ETHXBT //BTCUSD //BTCEUR //XMRXBT //XRPUSD //XRPXBT //BABUSD //BABEUR
-//
-//********************************************************************************************
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -139,6 +135,25 @@ public class MainActivity extends AppCompatActivity {
     private static BigDecimal[] bittrexAsk = new BigDecimal[1000];
     private static BigDecimal[] bittrexVolume = new BigDecimal[1000];
 
+    private static String[] binancePair = new String[1000];
+    private static BigDecimal[] binanceBid = new BigDecimal[1000];
+    private static BigDecimal[] binanceAsk = new BigDecimal[1000];
+    private static BigDecimal[] binanceVolume = new BigDecimal[1000];
+
+    private static String[] okexPair = new String[1000];
+    private static BigDecimal[] okexBid = new BigDecimal[1000];
+    private static BigDecimal[] okexAsk = new BigDecimal[1000];
+    private static BigDecimal[] okexVolume = new BigDecimal[1000];
+
+    private static String[] krakenPair = new String[1000];
+    private static BigDecimal[] krakenBid = new BigDecimal[1000];
+    private static BigDecimal[] krakenAsk = new BigDecimal[1000];
+    private static BigDecimal[] krakenVolume = new BigDecimal[1000];
+
+    private static String[] poloniexPair = new String[1000];
+    private static BigDecimal[] poloniexBid = new BigDecimal[1000];
+    private static BigDecimal[] poloniexAsk = new BigDecimal[1000];
+    private static BigDecimal[] poloniexVolume = new BigDecimal[1000];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -198,6 +213,7 @@ public class MainActivity extends AppCompatActivity {
                     try {
 
                         JSONArray innerArr = response.getJSONArray(i);
+
 
                         String pairInside = innerArr.getString(0);
                         BigDecimal bidBD = new BigDecimal(innerArr.getString(1));
@@ -271,39 +287,200 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        populateWiget();
-
         queue.add(bittrexObject);
 
+        URL = "https://api.binance.com/api/v3/ticker/bookTicker";
+
+        JsonArrayRequest binanceFeed = new JsonArrayRequest(Request.Method.GET, URL, null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+
+                try {
+
+                    for (int i = 0; i < response.length(); i++) {
+                        JSONObject obj = response.getJSONObject(i);
+                        binancePair[i] = obj.getString("symbol");
+                        binanceAsk[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("askPrice")));
+                        binanceBid[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("bidPrice")));
+                        binanceVolume[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("bidQty")));
+
+
+                        Log.d("LOGTHISBITCH", binancePair[i] + " " + binanceAsk[i].toString() + " " +
+                                binanceBid[i].toString() + " " + binanceVolume[i].toString());
+                    }
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+        queue.add(binanceFeed);
+
+
+        URL = "https://www.okex.com/api/spot/v3/instruments/ticker";
+
+        JsonArrayRequest okexFeed = new JsonArrayRequest(Request.Method.GET, URL, null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+
+                JSONObject arrReq = null;
+                try {
+
+
+                    for (int i = 0; i < response.length(); i++) {
+
+                        arrReq = response.getJSONObject(i);
+
+                        okexPair[i] = arrReq.getString("instrument_id");
+                        okexBid[i] = BigDecimal.valueOf(Double.parseDouble(arrReq.getString("bid")));
+                        okexAsk[i] = BigDecimal.valueOf(Double.parseDouble(arrReq.getString("ask")));
+                        okexVolume[i] = BigDecimal.valueOf(Double.parseDouble(arrReq.getString("base_volume_24h")));
+
+
+                        Log.d("OKEX", okexPair[i].toString() + " " + okexBid[i].toString() + " "
+                                + okexAsk[i].toString() + " " + okexVolume[i].toString());
+
+                    }
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+        queue.add(okexFeed);
+
+
+        URL = "https://api.kraken.com/0/public/Ticker?pair=BCHEUR,BCHUSD,BCHXBT,DASHEUR,DASHUSD,DASHXBT,EOSETH,EOSXBT,GNOETH,GNOXBT,USDTZUSD,XETCXETH,XETCXXBT,XETCZEUR,XETCZUSD,XETHXXBT,XETHZGBP,XETHZJPY,XETHZUSD,XICNXETH,XICNXXBT,XLTCXXBT,XLTCZEUR,XLTCZUSD,XMLNXETH,XMLNXXBT,XREPXETH,XREPXXBT,XREPZEUR,XXBTZCAD,XXBTZEUR,XXBTZGBP,XXBTZJPY,XXBTZUSD,XXDGXXBT,XXLMXXBT,XXMRXXBT,XXMRZEUR,XXMRZUSD,XXRPXXBT,XXRPZEUR,XXRPZUSD,XZECXXBT,XZECZEUR,XZECZUSD";
+
+        JsonObjectRequest krakenFeed = new JsonObjectRequest(Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+                try {
+
+                    int krakenCountprice = 0;
+                    int krakenCountPair = 0;
+                    JSONObject obj = response.getJSONObject("result");
+
+                    Iterator keyPair = obj.keys();
+                    while (keyPair.hasNext()) {
+
+
+                        krakenPair[krakenCountPair] = (String) keyPair.next();
+
+                        Log.d("KRAKEN crazy", krakenPair[krakenCountPair].toString());
+                        krakenCountPair++;
+                    }
+
+                    //Grab pairs**********************************************************
+                    for (Iterator key = obj.keys(); key.hasNext(); ) {
+
+                        JSONObject innerObj = (JSONObject) obj.get((String) key.next());
+
+                        JSONArray askArr = innerObj.getJSONArray("a");
+                        JSONArray bidArr = innerObj.getJSONArray("b");
+                        String kask = askArr.getString(0);
+                        String kbid = bidArr.getString(0);
+
+
+                        krakenAsk[krakenCountprice] = BigDecimal.valueOf(Double.parseDouble(kask));
+                        krakenBid[krakenCountprice] = BigDecimal.valueOf(Double.parseDouble(kbid));
+
+
+                        Log.d("KRAKEN set", krakenPair[krakenCountprice] + " " + krakenAsk[krakenCountprice].toString() + " " + krakenBid[krakenCountprice].toString());
+                        krakenCountprice++;
+
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+        queue.add(krakenFeed);
+
+        URL = "https://poloniex.com/public?command=returnTicker";
+
+        JsonObjectRequest poloniexFeed = new JsonObjectRequest(Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+                Iterator keys = response.keys();
+                int poloniexCounter = 0;
+
+
+
+                while (keys.hasNext()) {
+
+                    String here = (String) keys.next();
+                    poloniexPair[poloniexCounter] = here;
+
+
+                    try {
+                        JSONObject obj = response.getJSONObject(here);
+                        String pAsk = obj.getString("lowestAsk");
+                        String pBid = obj.getString("highestBid");
+                        poloniexAsk[poloniexCounter] = BigDecimal.valueOf(Double.parseDouble(pAsk));
+                        poloniexBid[poloniexCounter] = BigDecimal.valueOf(Double.parseDouble(pBid));
+
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    Log.d("POLONIEX_set", poloniexPair[poloniexCounter] + " " + poloniexAsk[poloniexCounter].toString() + " " + poloniexBid[poloniexCounter].toString());
+
+                    poloniexCounter++;
+                }
+
+
+
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+        queue.add(poloniexFeed);
+
+        populateWiget();
+
+
     }
+
 
     private void populateWiget() {
 
-        //   Log.d("ETHUSD", ETHUSD_bitfinex.getBid().toString());
-
-        try {
-
-            String testString = (ETHUSD_bitfinex.getBid().toString()
-
-                    + "\n" + BTCUSD_bitfinex.getBid().toString() + "\n" + BTCEUR_bitfinex.getBid().toString() + "\n"
-                    + ETHBTC_bitfinex.getBid().toString() + "\n" + XMRBTC_bitfinex.getBid().toString() + "\n"
-                    + XRPUSD_bitfinex.getBid().toString() + "\n"
-                    + XRPBTC_bitfinex.getBid().toString() + "\n" + ETCBTC_bitfinex.getBid().toString() + "\n"
-//                            + BABUSD_bitfinex.getBid().toString()
-//
-            );
-
-            Log.d("Good", testString);
-            pair.setText(testString);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
 
     }
 
-   
+
     private BigDecimal getMyBigDeci(String str) {
 
         BigDecimal b;
