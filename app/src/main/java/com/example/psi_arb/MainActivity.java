@@ -230,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
                         bittrexVolume[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("BaseVolume")));
                         bittrexPair[i] = obj.getString("MarketName");
 
-                        Log.d("OK", bittrexVolume[i].toString());
+                        Log.d("OK", bittrexPair[i] + bittrexVolume[i].toString());
 
 
                     }
@@ -270,7 +270,7 @@ public class MainActivity extends AppCompatActivity {
                         binanceVolume[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("bidQty")));
 
 
-                        Log.d("LOGTHISBITCH", binancePair[i] + " " + binanceAsk[i].toString() + " " +
+                        Log.d("Binance Set", binancePair[i] + " " + binanceAsk[i].toString() + " " +
                                 binanceBid[i].toString() + " " + binanceVolume[i].toString());
                     }
 
