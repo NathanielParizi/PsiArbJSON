@@ -230,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
                         bittrexVolume[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("BaseVolume")));
                         bittrexPair[i] = obj.getString("MarketName");
 
-                        Log.d("OK", bittrexPair[i] + bittrexVolume[i].toString());
+                        Log.d("BittrexSet", bittrexPair[i] + bittrexVolume[i].toString());
 
 
                     }
@@ -349,7 +349,7 @@ public class MainActivity extends AppCompatActivity {
 
                         krakenPair[krakenCountPair] = (String) keyPair.next();
 
-                        Log.d("KRAKEN crazy", krakenPair[krakenCountPair].toString());
+
                         krakenCountPair++;
                     }
 
@@ -404,10 +404,8 @@ public class MainActivity extends AppCompatActivity {
 
                     try {
                         JSONObject obj = response.getJSONObject(here);
-                        String pAsk = obj.getString("lowestAsk");
-                        String pBid = obj.getString("highestBid");
-                        poloniexAsk[poloniexCounter] = BigDecimal.valueOf(Double.parseDouble(pAsk));
-                        poloniexBid[poloniexCounter] = BigDecimal.valueOf(Double.parseDouble(pBid));
+                        poloniexAsk[poloniexCounter] = BigDecimal.valueOf(Double.parseDouble(obj.getString("lowestAsk")));
+                        poloniexBid[poloniexCounter] = BigDecimal.valueOf(Double.parseDouble(obj.getString("highestBid")));
 
 
                     } catch (JSONException e) {
