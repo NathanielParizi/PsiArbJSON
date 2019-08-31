@@ -37,6 +37,8 @@ import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import static com.android.volley.Request.*;
@@ -180,34 +182,33 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("Response: ", response.toString());
 
 
+                bitfinexPair = new String[417];
 
-                for (int i = 0; i < 50; i++) {
+                Log.d("COOLSPOT3", String.valueOf(response.length()));
+
+                for (int i = 0; i < 417; i++) {
+
 
                     try {
 
                         JSONArray innerArr = response.getJSONArray(i);
 
 
-                        String pairInside = innerArr.getString(0);
-                        BigDecimal bidBD = new BigDecimal(innerArr.getString(1));
-                        BigDecimal askBD = new BigDecimal(innerArr.getString(3));
+                        String strCheck = innerArr.getString(0);
+                        if (strCheck.charAt(0) == 't') {
+                            bitfinexxBid[i] = BigDecimal.valueOf(Double.parseDouble(innerArr.getString(1)));
+                            bitfinexAsk[i] = BigDecimal.valueOf(Double.parseDouble(innerArr.getString(3)));
+                            bitfinexVolume[i] = BigDecimal.valueOf(Double.parseDouble(innerArr.getString(8)));
+                            bitfinexPair[i] = innerArr.getString(0).substring(0);
 
-                        bitfinexxBid[i] = BigDecimal.valueOf(Double.parseDouble(innerArr.getString(1)));
-                        bitfinexAsk[i] = BigDecimal.valueOf(Double.parseDouble(innerArr.getString(3)));
-                        bitfinexVolume[i] = BigDecimal.valueOf(Double.parseDouble(innerArr.getString(8)));
-                        bitfinexPair[i] = innerArr.getString(0);
+                            //Normalize data
+                            String base = bitfinexPair[i].substring(1, 4);
+                            String quote = bitfinexPair[i].substring(4, 7);
+                            bitfinexPair[i] = base + "_" + quote;
 
+                        }
 
-                        //Normalize data
-                        String base = bitfinexPair[i].substring(0, 3);
-                        String quote = bitfinexPair[i].substring(3, 6);
-                        bitfinexPair[i] = base + "_" + quote;
-
-
-                        Log.d("COUNTBITFIN", bitfinexPair[i]);
-
-
-                        Log.d("BITFINEX", bitfinexPair[i] + " " + bitfinexxBid[i].toString() + " " + bitfinexAsk[i].toString() + " " + bitfinexVolume[i].toString());
+                        Log.d("BITFINEX", bitfinexPair.length + "i: " + i + bitfinexPair[i] + " " + bitfinexxBid[i].toString() + " " + bitfinexAsk[i].toString() + " " + bitfinexVolume[i].toString());
 
                         //    Log.d("Items: ", jArr.getString(i));
 
@@ -236,10 +237,13 @@ public class MainActivity extends AppCompatActivity {
 
                 try {
 
+
                     JSONArray metadataArr = response.getJSONArray("result");
 
+                    bittrexPair = new String[metadataArr.length()];
 
                     for (int i = 0; i < metadataArr.length(); i++) {
+
 
                         JSONObject obj = metadataArr.getJSONObject(i);
 
@@ -249,9 +253,9 @@ public class MainActivity extends AppCompatActivity {
                         bittrexPair[i] = obj.getString("MarketName");
 
                         //Normalize data
-                        bittrexPair[i].replace("-", "_");
+                       bittrexPair[i] = bittrexPair[i].replace("-", "_");
 
-                        Log.d("BittrexSet", bittrexPair[i] + bittrexVolume[i].toString());
+                        Log.d("BittrexSet", bittrexPair.length + " " + bittrexPair[i] + bittrexVolume[i].toString());
 
 
                     }
@@ -280,6 +284,9 @@ public class MainActivity extends AppCompatActivity {
         final JsonArrayRequest binanceFeed = new JsonArrayRequest(Request.Method.GET, URL, null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
+
+                binancePair = new String[response.length()];
+
 
                 try {
 
@@ -313,12 +320,12 @@ public class MainActivity extends AppCompatActivity {
                             String quote = binancePair[i].substring(3, 6);
                             binancePair[i] = base + "_" + quote;
 
-                            //                                        Log.d("Binance4Pair", binancePair[i]);
+                            //                                       Log.d("Binance4Pair", binancePair[i]);
 
                         }
 
 
-                        Log.d("BinanceSet", binancePair[i] + " " + binanceAsk[i].toString() + " " +
+                        Log.d("BinanceSet", binancePair.length + " " + binancePair[i] + " " + binanceAsk[i].toString() + " " +
                                 binanceBid[i].toString() + " " + binanceVolume[i].toString());
                     }
 
@@ -347,6 +354,7 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject arrReq = null;
                 try {
 
+                    okexPair = new String[response.length()];
 
                     for (int i = 0; i < response.length(); i++) {
 
@@ -360,7 +368,8 @@ public class MainActivity extends AppCompatActivity {
                         //Normalize data
                         okexPair[i] = okexPair[i].replace("-", "_");
 
-                        Log.d("OKEX", okexPair[i].toString() + " " + okexBid[i].toString() + " "
+                        Log.d("OKEX", okexPair.length
+                                + " " + okexPair[i].toString() + " " + okexBid[i].toString() + " "
                                 + okexAsk[i].toString() + " " + okexVolume[i].toString());
 
 
@@ -388,24 +397,30 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(JSONObject response) {
 
+
                 try {
+
 
                     int krakenCountprice = 0;
                     int krakenCountPair = 0;
                     JSONObject obj = response.getJSONObject("result");
 
                     Iterator keyPair = obj.keys();
+
+                    int countK = obj.length();
+                    krakenPair = new String[countK];
+
                     while (keyPair.hasNext()) {
 
 
                         krakenPair[krakenCountPair] = (String) keyPair.next();
-
-
                         krakenCountPair++;
+
                     }
 
                     //Grab pairs**********************************************************
                     for (Iterator key = obj.keys(); key.hasNext(); ) {
+
 
                         JSONObject innerObj = (JSONObject) obj.get((String) key.next());
 
@@ -457,8 +472,11 @@ public class MainActivity extends AppCompatActivity {
                         krakenPair[krakenCountprice] = krakenPair[krakenCountprice].replace("ZJPY", "JPY");
                         krakenPair[krakenCountprice] = krakenPair[krakenCountprice].replace("ZCAD", "CAD");
                         krakenPair[krakenCountprice] = krakenPair[krakenCountprice].replace("ZGBP", "GBP");
-                        Log.d("KRAKEN set", krakenPair[krakenCountprice] + " " + krakenAsk[krakenCountprice].toString() + " " + krakenBid[krakenCountprice].toString());
+
+
+                        Log.d("KRAKEN set", krakenPair.length + " " + krakenPair[krakenCountprice] + " " + krakenAsk[krakenCountprice].toString() + " " + krakenBid[krakenCountprice].toString());
                         krakenCountprice++;
+
 
                     }
 
@@ -485,6 +503,7 @@ public class MainActivity extends AppCompatActivity {
                 Iterator keys = response.keys();
                 int poloniexCounter = 0;
 
+                poloniexPair = new String[response.length()];
 
                 while (keys.hasNext()) {
 
@@ -501,7 +520,7 @@ public class MainActivity extends AppCompatActivity {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    Log.d("POLONIEX_set", poloniexPair[poloniexCounter] + " " + poloniexAsk[poloniexCounter].toString() + " " + poloniexBid[poloniexCounter].toString());
+                    Log.d("POLONIEX_set", poloniexPair.length + " " + poloniexPair[poloniexCounter] + " " + poloniexAsk[poloniexCounter].toString() + " " + poloniexBid[poloniexCounter].toString());
 
                     poloniexCounter++;
                 }
@@ -518,11 +537,37 @@ public class MainActivity extends AppCompatActivity {
         queue.add(poloniexFeed);
 
 
-      String[] pairTokens = concatenate(bitfinexPair, binancePair);
+        //******************************************************************** JSON Parsing Complete
 
-        Log.d("pairTokens", String.valueOf(pairTokens.length));
 
+        String[] pairTokens = {};
+        pairTokens = concatenate(pairTokens, bitfinexPair);
+        pairTokens = concatenate(pairTokens, bittrexPair);
+        pairTokens = concatenate(pairTokens, binancePair);
+        pairTokens = concatenate(pairTokens, okexPair);
+        pairTokens = concatenate(pairTokens, krakenPair);
+        pairTokens = concatenate(pairTokens, poloniexPair);
+
+        String[] shortcut = bitfinexPair;
+        BigDecimal[] shortcutAsk = bitfinexAsk;
+        BigDecimal[] shortcutBid = bitfinexxBid;
+        for (int i = 0; i < shortcut.length; i++) {
+            if (!Arrays.asList(shortcut).subList(0, shortcut.length).contains(null)) {
+                Log.d("Goodspot3", shortcut[i] + " " + i + shortcutAsk[i] + shortcutBid[i]);
+            }
+        }
+
+
+        if ((!Arrays.asList(pairTokens).subList(0, pairTokens.length).contains(null)) && (bitfinexPair.length < 1000 && bittrexPair.length < 1000 && binancePair.length < 1000 && okexPair.length < 1000
+                && krakenPair.length < 1000 && poloniexPair.length < 1000)) {
+
+            String[] exchange = new String[pairTokens.length];
+
+
+            Log.d("pairTokens", String.valueOf(pairTokens.length) + " " + binancePair.length + " " + bitfinexPair.length);
+        }
     }
+
 
     public <T> T[] concatenate(T[] a, T[] b) {
         int aLen = a.length;
