@@ -12,6 +12,7 @@ package com.example.psi_arb;
 public class NormalizePairs {
 
     private static String pair;
+    private static String[] binancePair = new String[1000];
 
     public static String getPair() {
         return pair;
