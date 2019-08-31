@@ -183,32 +183,31 @@ public class MainActivity extends AppCompatActivity {
 
 
                 bitfinexPair = new String[417];
+                bitfinexAsk = new BigDecimal[417];
+                bitfinexxBid = new BigDecimal[417];
+
 
                 Log.d("COOLSPOT3", String.valueOf(response.length()));
 
                 for (int i = 0; i < 417; i++) {
-
 
                     try {
 
                         JSONArray innerArr = response.getJSONArray(i);
 
 
-                        String strCheck = innerArr.getString(0);
-                        if (strCheck.charAt(0) == 't') {
-                            bitfinexxBid[i] = BigDecimal.valueOf(Double.parseDouble(innerArr.getString(1)));
-                            bitfinexAsk[i] = BigDecimal.valueOf(Double.parseDouble(innerArr.getString(3)));
-                            bitfinexVolume[i] = BigDecimal.valueOf(Double.parseDouble(innerArr.getString(8)));
-                            bitfinexPair[i] = innerArr.getString(0).substring(0);
+                        bitfinexxBid[i] = BigDecimal.valueOf(Double.parseDouble(innerArr.getString(1)));
+                        bitfinexAsk[i] = BigDecimal.valueOf(Double.parseDouble(innerArr.getString(3)));
+                        bitfinexVolume[i] = BigDecimal.valueOf(Double.parseDouble(innerArr.getString(8)));
+                        bitfinexPair[i] = innerArr.getString(0).substring(0);
 
-                            //Normalize data
-                            String base = bitfinexPair[i].substring(1, 4);
-                            String quote = bitfinexPair[i].substring(4, 7);
-                            bitfinexPair[i] = base + "_" + quote;
+                        //Normalize data
+                        String base = bitfinexPair[i].substring(1, 4);
+                        String quote = bitfinexPair[i].substring(4, 7);
+                        bitfinexPair[i] = base + "_" + quote;
 
-                        }
 
-                        Log.d("BITFINEX", bitfinexPair.length + "i: " + i + bitfinexPair[i] + " " + bitfinexxBid[i].toString() + " " + bitfinexAsk[i].toString() + " " + bitfinexVolume[i].toString());
+                        Log.d("BITFINEX", bitfinexPair.length + "i:" + i + " " + (bitfinexPair[i]) + " " + bitfinexxBid[i].toString() + " " + bitfinexAsk[i].toString() + " " + bitfinexVolume[i].toString());
 
                         //    Log.d("Items: ", jArr.getString(i));
 
@@ -241,6 +240,8 @@ public class MainActivity extends AppCompatActivity {
                     JSONArray metadataArr = response.getJSONArray("result");
 
                     bittrexPair = new String[metadataArr.length()];
+                    bittrexAsk = new BigDecimal[metadataArr.length()];
+                    bittrexBid = new BigDecimal[metadataArr.length()];
 
                     for (int i = 0; i < metadataArr.length(); i++) {
 
@@ -253,7 +254,7 @@ public class MainActivity extends AppCompatActivity {
                         bittrexPair[i] = obj.getString("MarketName");
 
                         //Normalize data
-                       bittrexPair[i] = bittrexPair[i].replace("-", "_");
+                        bittrexPair[i] = bittrexPair[i].replace("-", "_");
 
                         Log.d("BittrexSet", bittrexPair.length + " " + bittrexPair[i] + bittrexVolume[i].toString());
 
@@ -286,6 +287,8 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(JSONArray response) {
 
                 binancePair = new String[response.length()];
+                binanceAsk = new BigDecimal[response.length()];
+                binanceBid = new BigDecimal[response.length()];
 
 
                 try {
@@ -355,6 +358,8 @@ public class MainActivity extends AppCompatActivity {
                 try {
 
                     okexPair = new String[response.length()];
+                    okexAsk = new BigDecimal[response.length()];
+                    okexBid = new BigDecimal[response.length()];
 
                     for (int i = 0; i < response.length(); i++) {
 
@@ -408,7 +413,10 @@ public class MainActivity extends AppCompatActivity {
                     Iterator keyPair = obj.keys();
 
                     int countK = obj.length();
+
                     krakenPair = new String[countK];
+                    krakenAsk = new BigDecimal[countK];
+                    krakenBid = new BigDecimal[countK];
 
                     while (keyPair.hasNext()) {
 
@@ -504,6 +512,8 @@ public class MainActivity extends AppCompatActivity {
                 int poloniexCounter = 0;
 
                 poloniexPair = new String[response.length()];
+                poloniexAsk = new BigDecimal[response.length()];
+                poloniexBid = new BigDecimal[response.length()];
 
                 while (keys.hasNext()) {
 
@@ -541,6 +551,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         String[] pairTokens = {};
+        BigDecimal[] bidTokens = {};
+        BigDecimal[] askTokens = {};
+
         pairTokens = concatenate(pairTokens, bitfinexPair);
         pairTokens = concatenate(pairTokens, bittrexPair);
         pairTokens = concatenate(pairTokens, binancePair);
@@ -548,22 +561,33 @@ public class MainActivity extends AppCompatActivity {
         pairTokens = concatenate(pairTokens, krakenPair);
         pairTokens = concatenate(pairTokens, poloniexPair);
 
-        String[] shortcut = bitfinexPair;
-        BigDecimal[] shortcutAsk = bitfinexAsk;
-        BigDecimal[] shortcutBid = bitfinexxBid;
-        for (int i = 0; i < shortcut.length; i++) {
-            if (!Arrays.asList(shortcut).subList(0, shortcut.length).contains(null)) {
-                Log.d("Goodspot3", shortcut[i] + " " + i + shortcutAsk[i] + shortcutBid[i]);
-            }
-        }
+        bidTokens = concatenate(bidTokens, bitfinexxBid);
+        bidTokens = concatenate(bidTokens, bittrexBid);
+        bidTokens = concatenate(bidTokens, binanceBid);
+        bidTokens = concatenate(bidTokens, okexBid);
+        bidTokens = concatenate(bidTokens, krakenBid);
+        bidTokens = concatenate(bidTokens, poloniexBid);
+
+        askTokens = concatenate(askTokens, bitfinexAsk);
+        askTokens = concatenate(askTokens, bittrexAsk);
+        askTokens = concatenate(askTokens, binanceAsk);
+        askTokens = concatenate(askTokens, okexAsk);
+        askTokens = concatenate(askTokens, krakenAsk);
+        askTokens = concatenate(askTokens, poloniexAsk);
 
 
-        if ((!Arrays.asList(pairTokens).subList(0, pairTokens.length).contains(null)) && (bitfinexPair.length < 1000 && bittrexPair.length < 1000 && binancePair.length < 1000 && okexPair.length < 1000
+        if ((!Arrays.asList(pairTokens).subList(0, pairTokens.length).contains(null))
+                && (!Arrays.asList(askTokens).subList(0, askTokens.length).contains(null))
+                && (!Arrays.asList(bidTokens).subList(0, bidTokens.length).contains(null))
+                && (bitfinexPair.length < 1000 && bittrexPair.length < 1000 && binancePair.length < 1000 && okexPair.length < 1000
                 && krakenPair.length < 1000 && poloniexPair.length < 1000)) {
 
             String[] exchange = new String[pairTokens.length];
 
 
+            for (int i = 0; i < pairTokens.length; i++) {
+                Log.d("GOLDRow", pairTokens[i] + " " + String.valueOf(askTokens[i]) + " " + String.valueOf(bidTokens[i]) + " i:" + i);
+            }
             Log.d("pairTokens", String.valueOf(pairTokens.length) + " " + binancePair.length + " " + bitfinexPair.length);
         }
     }
