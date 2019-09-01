@@ -586,19 +586,21 @@ public class MainActivity extends AppCompatActivity {
 
             String[] exchange = new String[pairTokens.length];
 
-        //************************************************************  [BASE]-[QUOTE]  TOKENS
-            String[] baseTokens = {};
-            String[] quoteTokens = {};
+            //************************************************************  [BASE]-[QUOTE]  TOKENS
+            String[] baseTokens = new String[pairTokens.length];
+            String[] quoteTokens = new String[pairTokens.length];
 
-            for(int i =0; i< pairTokens.length; i++){
+            for (int i = 0; i < pairTokens.length; i++) {
 
-                if(pairTokens[i].indexOf("_") == -1){
+                if (pairTokens[i].indexOf("_") == -1) {
                     baseTokens[i] = "EMPTY";
                     quoteTokens[i] = "EMPTY";
+                } else {
+
+                   int indexOf_ = pairTokens[i].indexOf("_");
+                    baseTokens[i] = pairTokens[i].substring(0, indexOf_);
+                quoteTokens[i] = pairTokens[i].substring(indexOf_,pairTokens[i].length());
                 }
-                int indexOf_ = pairTokens[i].indexOf("_");
-                baseTokens[i] = pairTokens[i].substring(0,indexOf_);
-                quoteTokens[i] = pairTokens[i].substring(indexOf_+1,pairTokens[i].length());
 
             }
             //******************************************************
