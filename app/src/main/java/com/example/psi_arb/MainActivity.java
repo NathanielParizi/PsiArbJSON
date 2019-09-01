@@ -103,6 +103,14 @@ public class MainActivity extends AppCompatActivity {
     static String c1;
     static String c2;
     static String c3;
+
+    static String c1Base;
+    static String c2Base;
+    static String c3Base;
+    static String c1Quote;
+    static String c2Quote;
+    static String c3Quote;
+
     static int z = 0;
     private static int pairCounter = 0;
     private static ArrayList<String> cPair = new ArrayList<>();
@@ -597,21 +605,103 @@ public class MainActivity extends AppCompatActivity {
                     quoteTokens[i] = "EMPTY";
                 } else {
 
-                   int indexOf_ = pairTokens[i].indexOf("_");
+                    int indexOf_ = pairTokens[i].indexOf("_");
                     baseTokens[i] = pairTokens[i].substring(0, indexOf_);
-                quoteTokens[i] = pairTokens[i].substring(indexOf_,pairTokens[i].length());
+                    quoteTokens[i] = pairTokens[i].substring(indexOf_ + 1, pairTokens[i].length());
                 }
 
             }
             //******************************************************
 
 
-            for (int i = 0; i < pairTokens.length; i++) {
-//                Log.d("GOLDRow", pairTokens[i] + " " + String.valueOf(askTokens[i]) + " " + String.valueOf(bidTokens[i]) + " i:" + i);
-                Log.d("GOLDRow", pairTokens[i] + " " + " [" + baseTokens[i] + "] [" + quoteTokens[i] + "] \t " + String.valueOf(askTokens[i]) + " " + String.valueOf(bidTokens[i]) + " i:" + i);
-            }
-            Log.d("pairTokens", String.valueOf(pairTokens.length) + " " + binancePair.length + " " + bitfinexPair.length);
+            arbitrage(pairTokens, baseTokens, quoteTokens, bidTokens, askTokens);
+
         }
+    }
+
+    public static void arbitrage(String[] pairTokens, String[] baseTokens, String[] quoteTokens, BigDecimal[] bidTokens, BigDecimal[] askTokens) {
+
+
+
+
+        for (int a = 0; a < pairTokens.length; a++) {
+
+            c1 = pairTokens[a];
+            c1Base = baseTokens[a];
+            c1Quote = quoteTokens[a];
+
+            for (int b = 0; b < pairTokens.length; b++) {
+
+                c2 = pairTokens[b];
+                c2Base = baseTokens[b];
+                c2Quote = quoteTokens[b];
+
+                for (int c = 0; c < pairTokens.length; c++) {
+
+                    c3 = pairTokens[c];
+                    c3Base = baseTokens[c];
+                    c3Quote = quoteTokens[c];
+
+
+                    //        for (int i = 0; i < pairTokens.length; i++) {
+////                Log.d("GOLDRow", pairTokens[i] + " " + String.valueOf(askTokens[i]) + " " + String.valueOf(bidTokens[i]) + " i:" + i);
+//            Log.d("GOLDRow", pairTokens[i] + " " + " [" + baseTokens[i] + "] [" + quoteTokens[i] + "] \t " + String.valueOf(askTokens[i]) + " " + String.valueOf(bidTokens[i]) + " i:" + i);
+//        }
+
+
+                    // Compare base currency with quote currency to secure round-trip triangular arbitrage
+                    if (
+                            (  // Path 1
+                                    (c1Quote.equals(c2Base) && c2Quote.equals(c3Base))
+                                            && (c1Base.equals(c3Quote)))
+
+                                    ||
+                                    (   // Path 2
+                                            (c1Quote.equals(c2Base) && c2Quote.equals(c3Quote))
+                                                    && (c1Base.equals(c3Base)))
+
+                                    ||
+                                    (   // Path 3
+                                            (c1Quote.equals(c2Quote) && c2Base.equals(c3Base))
+                                                    && (c1Base.equals(c3Quote)))
+
+                                    ||
+                                    (// Path 4
+                                            (c1Quote.equals(c2Quote) && c2Base.equals(c3Quote))
+                                                    && (c1Base.equals(c3Base)))
+
+                                    ||
+                                    (   // Path 5
+                                            (c1Base.equals(c2Base) && c2Quote.equals(c3Base))
+                                                    && (c1Quote.equals(c3Quote)))
+                                    ||
+
+                                    (   // Path 6
+                                            (c1Base.equals(c2Base) && c2Quote.equals(c3Quote))
+                                                    && (c1Quote.equals(c3Base)))
+
+                                    ||
+                                    (   // Path 7
+                                            (c1Base.equals(c2Quote) && c2Base.equals(c3Base))
+                                                    && (c1Quote.equals(c3Quote)))
+
+                                    ||
+                                    (   // Path 8
+                                            (c1Base.equals(c2Quote) && c2Base.equals(c3Quote))
+                                                    && (c1Quote.equals(c3Base)))
+                    ) {
+
+                    }
+
+
+
+
+                }
+            }
+        }
+
+
+
     }
 
 
