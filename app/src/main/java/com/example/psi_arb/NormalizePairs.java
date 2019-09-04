@@ -891,6 +891,9 @@ public class NormalizePairs {
             case "CVCUSDT":
                 binancePair[i] = "CVC_USDT";
                 break;
+            default:
+                binancePair[i] = "EMPTY";
+
         }
 
     }

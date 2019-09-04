@@ -1,13 +1,7 @@
 package com.example.psi_arb;
 
-import android.content.Context;
-import android.media.SoundPool;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.content.Loader;
-import android.support.v4.content.res.TypedArrayUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -19,7 +13,6 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
@@ -27,21 +20,18 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.lang.reflect.Array;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
+import java.util.Set;
 
-import static com.android.volley.Request.*;
 import static com.example.psi_arb.NormalizePairs.normalize;
 
 //*******************************************************************************************
@@ -80,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
     StringBuffer optimalPathText = new StringBuffer();
 
     static double profitTarget = 1;
+
+    private static int timer = 1000;
 
     public static BigDecimal cd1b = new BigDecimal(0);
     public static BigDecimal cd1a = new BigDecimal(0);
@@ -167,14 +159,50 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-
-                getCryptoPair();
+        getCryptoPair();
+                //new LongOperation().execute("");
 
 
             }
         });
 
     }
+
+    private class LongOperation extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+
+
+                try {
+                    getCryptoPair();
+                    Thread.sleep(timer);
+                    Log.d("Liquid", "test" );
+
+                } catch (InterruptedException e) {
+                    Thread.interrupted();
+                }
+
+            return "Executed";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+
+
+            // might want to change "executed" for the returned string passed
+            // into onPostExecute() but that is upto you
+        }
+
+        @Override
+        protected void onPreExecute() {
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+        }
+    }
+
 
     private void getCryptoPair() {
 
@@ -212,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
 
                         //Normalize data
                         String base = bitfinexPair[i].substring(1, 4);
-                        String quote = bitfinexPair[i].substring(4, 7);
+                        String quote = bitfinexPair[i].substring(4, bitfinexPair[i].length());
                         bitfinexPair[i] = base + "_" + quote;
 
 
@@ -592,6 +620,8 @@ public class MainActivity extends AppCompatActivity {
                 && (bitfinexPair.length < 1000 && bittrexPair.length < 1000 && binancePair.length < 1000 && okexPair.length < 1000
                 && krakenPair.length < 1000 && poloniexPair.length < 1000)) {
 
+            timer = 60000;
+
             String[] exchange = new String[pairTokens.length];
 
             //************************************************************  [BASE]-[QUOTE]  TOKENS
@@ -611,36 +641,118 @@ public class MainActivity extends AppCompatActivity {
                 }
 
             }
-            //******************************************************
+
 
 
             arbitrage(pairTokens, baseTokens, quoteTokens, bidTokens, askTokens);
 
+
+        }else{
+
+            new LongOperation().execute();
         }
     }
 
-    public static void arbitrage(String[] pairTokens, String[] baseTokens, String[] quoteTokens, BigDecimal[] bidTokens, BigDecimal[] askTokens) {
+    private static boolean liquidCheck(String str) {
+
+        switch (str) {
+
+            case "ETH":
+                return true;
+            case "BTC":
+                return true;
+            case "USDT":
+                return true;
+            case "LTC":
+                return true;
+            case "BCH":
+                return true;
+            case "XRP":
+                return true;
+            case "EOS":
+                return true;
+//            case "BNB":
+//                return true;
+//            case "XLM":
+//                return true;
+//            case "ADA":
+//                return true;
+//            case "TRON":
+//                return true;
 
 
+        }
+
+        return false;
+    }
+
+    public static boolean arbChain() {
+
+        return true;
+    }
+
+    public void arbitrage(String[] pairTokens, String[] baseTokens, String[] quoteTokens, BigDecimal[] bidTokens, BigDecimal[] askTokens) {
 
 
-        for (int a = 0; a < pairTokens.length; a++) {
+        String exchange[] = {"poloniex", "kraken", "binance", "somethin", "cool", "great"};
+        String base[] = baseTokens;
+        String quote[] = pairTokens;
 
-            c1 = pairTokens[a];
-            c1Base = baseTokens[a];
-            c1Quote = quoteTokens[a];
+        List<String> currencyList = Arrays.asList(baseTokens);
+        Set<String> currList = new HashSet<String>(currencyList);
 
-            for (int b = 0; b < pairTokens.length; b++) {
+        String[] currArr = new String[baseTokens.length];
+        currArr = currList.toArray(new String[currList.size()]);
+        HashMap<String, String> currMap = new HashMap<>();
 
-                c2 = pairTokens[b];
-                c2Base = baseTokens[b];
-                c2Quote = quoteTokens[b];
 
-                for (int c = 0; c < pairTokens.length; c++) {
+        //******************************************************  Filter out liquid currencies
+        ArrayList<String> baseTokensLiq = new ArrayList<>();
+        ArrayList<String> quoteTokensLiq = new ArrayList<>();
+        int[] chainIndex = new int[pairTokens.length];
+        for (int i = 0, ii = 0; i < baseTokens.length; i++) {
+            if (liquidCheck(baseTokens[i]) && liquidCheck(quoteTokens[i])) {
+                baseTokensLiq.add(baseTokens[i]);
+                quoteTokensLiq.add(quoteTokens[i]);
+                chainIndex[ii] = i;
+                ii++;
+            }
 
-                    c3 = pairTokens[c];
-                    c3Base = baseTokens[c];
-                    c3Quote = quoteTokens[c];
+        }
+
+        String[] baseTokensLiqArr = new String[baseTokensLiq.size()];
+        baseTokensLiqArr = baseTokensLiq.toArray(baseTokensLiqArr);
+        String[] quoteTokensLiqArr = new String[quoteTokensLiq.size()];
+        quoteTokensLiqArr = quoteTokensLiq.toArray(quoteTokensLiqArr);
+
+        Log.d("LiquidCoins", baseTokensLiq.size() + " " + String.valueOf(baseTokensLiq));
+        Log.d("LiquidCoins", quoteTokensLiq.size() + " " + String.valueOf(quoteTokensLiq));
+
+        String[] pairTokensLiquid = new String[baseTokens.length];
+
+        //Load liquid pairs
+        for(int i =0; i <  baseTokensLiqArr.length; i++){
+            pairTokensLiquid[i] = baseTokensLiqArr[i];
+            pairTokensLiquid[i] += quoteTokensLiqArr[i];
+        }
+
+        for (int a = 0; a < baseTokensLiqArr.length; a++) {
+
+            c1 = pairTokensLiquid[a];
+            c1Base = baseTokensLiqArr[a];
+            c1Quote = quoteTokensLiqArr[a];
+
+            for (int b = 0; b < baseTokensLiqArr.length; b++) {
+
+                c2 = pairTokensLiquid[b];
+                c2Base = baseTokensLiqArr[b];
+                c2Quote = quoteTokensLiqArr[b];
+
+                for (int c = 0; c < baseTokensLiqArr.length; c++) {
+
+                    c3 = pairTokensLiquid[c];
+                    c3Base = baseTokensLiqArr[c];
+                    c3Quote = quoteTokensLiqArr[c];
 
 
                     //        for (int i = 0; i < pairTokens.length; i++) {
@@ -691,15 +803,16 @@ public class MainActivity extends AppCompatActivity {
                                                     && (c1Quote.equals(c3Base)))
                     ) {
 
+                        Log.d("TheChains", "[" + c1 + "] [" + c2 + "] [" + c3 + "]");
+
+                        int timer = 60000;
+                        new LongOperation().execute();
                     }
-
-
 
 
                 }
             }
         }
-
 
 
     }
