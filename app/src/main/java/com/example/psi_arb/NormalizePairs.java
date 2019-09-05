@@ -9,6 +9,8 @@ package com.example.psi_arb;
 // operations.
 //*****************************************************************
 
+import static com.example.psi_arb.MainActivity.poloniexPair;
+
 public class NormalizePairs {
 
     private static String pair;
@@ -895,6 +897,19 @@ public class NormalizePairs {
                 binancePair[i] = "EMPTY";
 
         }
+
+
+    }
+
+    public static void normalizePoloniex(String str, int i){
+
+        if(str.equals("BTC_EOS")){
+            poloniexPair[i] = "EOS_BTC";
+        }
+        if(str.equals("ETH_EOS")){
+            poloniexPair[i] = "EOS_ETH";
+        }
+
 
     }
 }
