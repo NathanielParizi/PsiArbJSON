@@ -70,9 +70,11 @@ public class MainActivity extends AppCompatActivity {
     StringBuffer optimalPathText = new StringBuffer();
 
     static double profitTarget = 1;
+    static String[] exchange;
 
     private static int timer = 1000;
     private static int[] chainIndex;
+    private static ArrayList<String[]> arbChain = new ArrayList<>();
 
     public static BigDecimal cd1b = new BigDecimal(0);
     public static BigDecimal cd1a = new BigDecimal(0);
@@ -80,8 +82,8 @@ public class MainActivity extends AppCompatActivity {
     public static BigDecimal cd2a = new BigDecimal(0);
     public static BigDecimal cd3b = new BigDecimal(0);
     public static BigDecimal cd3a = new BigDecimal(0);
-    //Double triArbitrage[] = new Double[10000000];
-    ArrayList<Double> triArbitrage = new ArrayList<>();
+    Double triArbitrage[] = new Double[10000000];
+    //ArrayList<Double> triArbitrage = new ArrayList<>();
     private static String tempPair;
 
     //***************************************************************
@@ -92,6 +94,14 @@ public class MainActivity extends AppCompatActivity {
     // calculate the arbitrage.
     //***************************************************************
 
+    String[] pairTokens = {};
+    BigDecimal[] bidTokens = {};
+    BigDecimal[] askTokens = {};
+
+    BigDecimal r1 = new BigDecimal(0);
+    BigDecimal r2 = new BigDecimal(0);
+    BigDecimal r3 = new BigDecimal(0);
+    BigDecimal rResult = new BigDecimal(0);
 
     static String c1;
     static String c2;
@@ -228,6 +238,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("COOLSPOT3", String.valueOf(response.length()));
 
                 for (int i = 0; i < 417; i++) {
+
 
                     try {
 
@@ -586,7 +597,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         //******************************************************************** JSON Parsing Complete
-
+        //
+        //******************************   Assign tokens
 
         String[] pairTokens = {};
         BigDecimal[] bidTokens = {};
@@ -615,15 +627,45 @@ public class MainActivity extends AppCompatActivity {
         askTokens = concatenate(askTokens, poloniexAsk);
 
 
+//*****************************************************************
+
+
         if ((!Arrays.asList(pairTokens).subList(0, pairTokens.length).contains(null))
                 && (!Arrays.asList(askTokens).subList(0, askTokens.length).contains(null))
                 && (!Arrays.asList(bidTokens).subList(0, bidTokens.length).contains(null))
                 && (bitfinexPair.length < 1000 && bittrexPair.length < 1000 && binancePair.length < 1000 && okexPair.length < 1000
                 && krakenPair.length < 1000 && poloniexPair.length < 1000)) {
 
+
             timer = 60000;
 
-            String[] exchange = new String[pairTokens.length];
+
+            //************************************************************************ Exchanges
+            exchange = new String[pairTokens.length];
+            for (int i = 0; i < bitfinexPair.length; i++) {
+                exchange[i] = "Bitfinex";
+            }
+            int market1 = bitfinexPair.length + bittrexPair.length;
+            for (int i = bitfinexPair.length; i < market1; i++) {
+                exchange[i] = "Bittrex";
+            }
+            int market2 = bitfinexPair.length + bittrexPair.length + binancePair.length;
+            for (int i = market1; i < market2; i++) {
+                exchange[i] = "Binance";
+            }
+            int market3 = bitfinexPair.length + bittrexPair.length + binancePair.length + okexPair.length;
+            for (int i = market2; i < market3; i++) {
+                exchange[i] = "OKEX";
+            }
+            int market4 = bitfinexPair.length + bittrexPair.length + binancePair.length + okexPair.length + krakenPair.length;
+            for (int i = market3; i < market4; i++) {
+                exchange[i] = "Kraken";
+            }
+            int market5 = bitfinexPair.length + bittrexPair.length + binancePair.length + okexPair.length + krakenPair.length + poloniexPair.length;
+            for (int i = market4; i < market5; i++) {
+                exchange[i] = "Poloniex";
+            }
+
 
             //************************************************************  [BASE]-[QUOTE]  TOKENS
             String[] baseTokens = new String[pairTokens.length];
@@ -659,6 +701,12 @@ public class MainActivity extends AppCompatActivity {
 
             new LongOperation().execute();
         }
+    }
+
+
+    private void assignExchange(String[] str) {
+
+
     }
 
     private static boolean liquidCheck(String str) {
@@ -702,7 +750,6 @@ public class MainActivity extends AppCompatActivity {
     public void arbitrage(String[] pairTokens, String[] baseTokens, String[] quoteTokens, BigDecimal[] bidTokens, BigDecimal[] askTokens) {
 
 
-        String exchange[] = {"poloniex", "kraken", "binance", "somethin", "cool", "great"};
         String base[] = baseTokens;
         String quote[] = pairTokens;
 
@@ -720,6 +767,7 @@ public class MainActivity extends AppCompatActivity {
         chainIndex = new int[pairTokens.length];
         for (int i = 0, ii = 0; i < baseTokens.length; i++) {
             if (liquidCheck(baseTokens[i]) && liquidCheck(quoteTokens[i])) {
+                Log.d("CheckLiquid", baseTokens[i] + " " + quoteTokens[i] + " \t at index:" + i + " \t Exchange:" + exchange[i]);
                 baseTokensLiq.add(baseTokens[i]);
                 quoteTokensLiq.add(quoteTokens[i]);
                 chainIndex[ii] = i;
@@ -807,14 +855,20 @@ public class MainActivity extends AppCompatActivity {
                                                     && (c1Quote.equals(c3Base)))
                     ) {
 
-                        Log.d("TheChains", "[" + c1 + "] [" + c2 + "] [" + c3 + "]");
+
+                        //  arbChain.add(c1 + " " + c2 + " " + c3);
 
                         int timer = 60000;
                         new LongOperation().execute();
 
-                        Log.d("ArbChain", "C1: [" + pairTokens[chainIndex[a]] + "]\t C2: [" + pairTokens[chainIndex[b]] + "]\t C3: [" + pairTokens[chainIndex[c]]);
-                        Log.d("ArbChainBid", "C1: [" + bidTokens[chainIndex[a]] + "]\t C2: [" + bidTokens[chainIndex[b]] + "]\t C3: [" + bidTokens[chainIndex[c]]);
-                        Log.d("ArbChainAsk", "C1: [" + askTokens[chainIndex[a]] + "]\t C2:[" + askTokens[chainIndex[b]] + "]\t C3: [" + askTokens[chainIndex[c]]);
+
+                        Log.d("CHAINs", "[" + c1 + "] [" + c2 + "] [" + c3 + "]");
+                        Log.d("CHAINS", "[" + exchange[chainIndex[a]] + "] [" + exchange[chainIndex[b]] + "] [" + exchange[chainIndex[c]] + "]");
+                        Log.d("CHAINS", "C1: [" + pairTokensLiquid[a] + "]\t C2: [" + pairTokensLiquid[b] + "]\t C3: [" + pairTokensLiquid[c]);
+                        Log.d("CHAINS", "C1: [" + pairTokens[chainIndex[a]] + "]\t C2: [" + pairTokens[chainIndex[b]] + "]\t C3: [" + pairTokens[chainIndex[c]]);//                   
+                        Log.d("CHAINS_BID", "C1: [" + bidTokens[chainIndex[a]] + "]\t C2: [" + bidTokens[chainIndex[b]] + "]\t C3: [" + bidTokens[chainIndex[c]]);
+                        Log.d("CHAINS_ASK", "C1: [" + askTokens[chainIndex[a]] + "]\t C2:[" + askTokens[chainIndex[b]] + "]\t C3: [" + askTokens[chainIndex[c]]);
+
 
                         // BID / ASK RATES for 3 pairs *****************
                         cd1b = bidTokens[chainIndex[a]];   // C1 Bid
@@ -829,81 +883,101 @@ public class MainActivity extends AppCompatActivity {
                         // Calculate triangular arbitrage
 
 
-                        if(  // Path 1
+                        if (  // Path 1
                                 (c1Quote.equals(c2Base) && c2Quote.equals(c3Base))
-                                        && (c1Base.equals(c3Quote))){
+                                        && (c1Base.equals(c3Quote))) {
 
-                            triArbitrage[z] = (100 * ( (1 / cd1b.doubleValue()) * (1 / cd2b.doubleValue()) * (1 / cd3b.doubleValue())  ) - 100);
+                            Log.d("DATACLEAN_EXCHANGE", "[" + exchange[chainIndex[a]] + "] [" + exchange[chainIndex[b]] + "] [" + exchange[chainIndex[c]] + "]");
+                            Log.d("DATACLEAN_CHAIN", "[" + c1 + "] [" + c2 + "] [" + c3 + "]");
+
+                            r1 = cd1b;
+                            Log.d("DATACLEAN_R1", String.valueOf(cd1b) + " " + String.valueOf(r1));
+
+                            r2 = r1.multiply(cd2b, MathContext.DECIMAL128);
+                            Log.d("DATACLEAN_R2", String.valueOf(cd2b) + " " + String.valueOf(r2));
+
+                            r3 = BigDecimal.valueOf(1);
+                            r3 = r3.divide(cd3b, MathContext.DECIMAL128);
+                            Log.d("DATACLEAN_R3", String.valueOf(cd3b) + " " + String.valueOf(r3));
+
+                            // Arbitrage Spread in percentage      --------> ( r2 - r3) / r3
+                            rResult = r2.subtract(r3, MathContext.DECIMAL32);
+                            rResult = rResult.divide(r3, MathContext.DECIMAL128);
+                            Log.d("DATACLEAN_RESULT:\t", String.valueOf(rResult));
+
+
+                            //triArbitrage[z] = (100 * ((1 / cd1b.doubleValue()) * (1 / cd2b.doubleValue()) * (1 / cd3b.doubleValue())) - 100);
                             path = 1;
 
                         }
 
 
-                        if(   // Path 2
+                        if (   // Path 2
                                 (c1Quote.equals(c2Base) && c2Quote.equals(c3Quote))
-                                        && (c1Base.equals(c3Base))){
+                                        && (c1Base.equals(c3Base))) {
 
-                            triArbitrage[z] = (100 * ( (1 / cd1b.doubleValue()) * (1 / cd2b.doubleValue()) * (cd3a.doubleValue())  ) - 100);
+                            triArbitrage[z] = (100 * ((1 / cd1b.doubleValue()) * (1 / cd2b.doubleValue()) * (cd3a.doubleValue())) - 100);
                             path = 2;
 
                         }
 
 
-                        if(   // Path 3
+                        if (   // Path 3
                                 (c1Quote.equals(c2Quote) && c2Base.equals(c3Base))
-                                        && (c1Base.equals(c3Quote))){
+                                        && (c1Base.equals(c3Quote))) {
 
-                            triArbitrage[z] = (100 * ( (1 / cd1b.doubleValue()) * (cd2a.doubleValue()) * (1 / cd3b.doubleValue())  ) - 100);
+                            triArbitrage[z] = (100 * ((1 / cd1b.doubleValue()) * (cd2a.doubleValue()) * (1 / cd3b.doubleValue())) - 100);
                             path = 3;
 
                         }
 
 
-                        if(// Path 4
+                        if (// Path 4
                                 (c1Quote.equals(c2Quote) && c2Base.equals(c3Quote))
-                                        && (c1Base.equals(c3Base))){
+                                        && (c1Base.equals(c3Base))) {
 
-                            triArbitrage[z] = (100 * ( (1 / cd1b.doubleValue()) * (cd2a.doubleValue()) * (cd3a.doubleValue())  ) - 100);
+                            triArbitrage[z] = (100 * ((cd1b.doubleValue()) * (1 / cd2a.doubleValue()) * (cd3a.doubleValue())) - 100);
                             path = 4;
 
                         }
 
 
-                        if(   // Path 5
+                        if (   // Path 5
                                 (c1Base.equals(c2Base) && c2Quote.equals(c3Base))
-                                        && (c1Quote.equals(c3Quote))){
+                                        && (c1Quote.equals(c3Quote))) {
 
-                            triArbitrage[z] = (100 * ( (cd1a.doubleValue()) * (1 / cd2b.doubleValue()) * (1 / cd3b.doubleValue())  ) - 100);
+                            //               triArbitrage[z] =  (BigDecimal.valueOf(100).multiply   (   cd1a.multiply(cd2b)     ));
+                            triArbitrage[z] = (100 * ((cd1a.doubleValue()) * (1 / cd2b.doubleValue()) * (1 / cd3b.doubleValue())) - 100);
                             path = 5;
 
                         }
 
 
-                        if(   // Path 6
+                        if (   // Path 6
                                 (c1Base.equals(c2Base) && c2Quote.equals(c3Quote))
-                                        && (c1Quote.equals(c3Base))){
+                                        && (c1Quote.equals(c3Base))) {
 
-                            triArbitrage[z] = (100 * ( (cd1a.doubleValue()) * (1 / cd2b.doubleValue()) * (cd3a.doubleValue())  ) - 100);
+                            triArbitrage[z] = (100 * ((cd1a.doubleValue()) * (1 / cd2b.doubleValue()) * (cd3a.doubleValue())) - 100);
                             path = 6;
 
                         }
 
 
-                        if(   // Path 7
+                        if (   // Path 7
                                 (c1Base.equals(c2Quote) && c2Base.equals(c3Base))
-                                        && (c1Quote.equals(c3Quote))){
+                                        && (c1Quote.equals(c3Quote))) {
 
-                            triArbitrage[z] = (100 * ( (cd1a.doubleValue()) * (cd2a.doubleValue()) * (1 / cd3b.doubleValue())  ) - 100);
+                            triArbitrage[z] = (100 * ((cd1a.doubleValue()) * (cd2a.doubleValue()) * (1 / cd3b.doubleValue())) - 100);
                             path = 7;
 
                         }
 
 
-                        if(   // Path 8
+                        if (   // Path 8
                                 (c1Base.equals(c2Quote) && c2Base.equals(c3Quote))
-                                        && (c1Quote.equals(c3Base))){
+                                        && (c1Quote.equals(c3Base))) {
 
-                            triArbitrage[z] = (100 * ( (cd1a.doubleValue()) * (cd2a.doubleValue()) * (cd3a.doubleValue())  ) - 100);
+                            triArbitrage[z] = (100 * ((cd1a.doubleValue()) * (cd2a.doubleValue()) * (cd3a.doubleValue())) - 100);
                             path = 8;
 
                         }
