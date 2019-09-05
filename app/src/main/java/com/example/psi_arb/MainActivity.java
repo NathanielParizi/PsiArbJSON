@@ -63,8 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "";
     TextView text;
     Button btn;
-    private double bid1 = 0;
-    private double ask1 = 0;
+
     private double x = 0;
     public int path = 0;
     StringBuffer optimalPathText = new StringBuffer();
@@ -94,14 +93,6 @@ public class MainActivity extends AppCompatActivity {
     // calculate the arbitrage.
     //***************************************************************
 
-    String[] pairTokens = {};
-    BigDecimal[] bidTokens = {};
-    BigDecimal[] askTokens = {};
-
-    BigDecimal r1 = new BigDecimal(0);
-    BigDecimal r2 = new BigDecimal(0);
-    BigDecimal r3 = new BigDecimal(0);
-    BigDecimal rResult = new BigDecimal(0);
 
     static String c1;
     static String c2;
@@ -171,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 getCryptoPair();
-                //new LongOperation().execute("");
+
 
 
             }
@@ -913,32 +904,17 @@ public class MainActivity extends AppCompatActivity {
 
                         // Calculate triangular arbitrage
 
+//                        Log.d("DATACLEAN_PATH_4", "[" + c1 + "] [" + c2 + "] [" + c3 + "]");
+//                        Log.d("DATACLEAN", "[" + exchange[chainIndex[a]] + "] [" + exchange[chainIndex[b]] + "] [" + exchange[chainIndex[c]] + "]");
+//                        Log.d("DATACLEAN", "C1: [" + pairTokens[chainIndex[a]] + "]\t C2: [" + pairTokens[chainIndex[b]] + "]\t C3: [" + pairTokens[chainIndex[c]]);//                        Log.d("ArbChain", "C1: [" + pairTokens[chainIndex[a]] + "]\t C2: [" + pairTokens[chainIndex[b]] + "]\t C3: [" + pairTokens[chainIndex[c]]);
+//                        Log.d("DATACLEAN", "C1: [" + bidTokens[chainIndex[a]] + "]\t C2: [" + bidTokens[chainIndex[b]] + "]\t C3: [" + bidTokens[chainIndex[c]]);
+//                        Log.d("DATACLEAN", "C1: [" + askTokens[chainIndex[a]] + "]\t C2:[" + askTokens[chainIndex[b]] + "]\t C3: [" + askTokens[chainIndex[c]]);
+
+
 
                         if (  // Path 1
                                 (c1Quote.equals(c2Base) && c2Quote.equals(c3Base))
                                         && (c1Base.equals(c3Quote))) {
-
-                            Log.d("DATACLEAN_PATH_1", "[" + c1 + "] [" + c2 + "] [" + c3 + "]");
-                            Log.d("DATACLEAN", "[" + exchange[chainIndex[a]] + "] [" + exchange[chainIndex[b]] + "] [" + exchange[chainIndex[c]] + "]");
-                            Log.d("DATACLEAN", "C1: [" + pairTokens[chainIndex[a]] + "]\t C2: [" + pairTokens[chainIndex[b]] + "]\t C3: [" + pairTokens[chainIndex[c]]);//                        Log.d("ArbChain", "C1: [" + pairTokens[chainIndex[a]] + "]\t C2: [" + pairTokens[chainIndex[b]] + "]\t C3: [" + pairTokens[chainIndex[c]]);
-                            Log.d("DATACLEAN", "C1: [" + bidTokens[chainIndex[a]] + "]\t C2: [" + bidTokens[chainIndex[b]] + "]\t C3: [" + bidTokens[chainIndex[c]]);
-                            Log.d("DATACLEAN", "C1: [" + askTokens[chainIndex[a]] + "]\t C2:[" + askTokens[chainIndex[b]] + "]\t C3: [" + askTokens[chainIndex[c]]);
-
-//
-//                            r1 = cd1b;
-//                            Log.d("DATACLEAN_R1", String.valueOf(cd1b) + " " + String.valueOf(r1));
-//
-//                            r2 = r1.multiply(cd2b, MathContext.DECIMAL128);
-//                            Log.d("DATACLEAN_R2", String.valueOf(cd2b) + " " + String.valueOf(r2));
-//
-//                            r3 = BigDecimal.valueOf(1);
-//                            r3 = r3.divide(cd3b, MathContext.DECIMAL128);
-//                            Log.d("DATACLEAN_R3", String.valueOf(cd3b) + " " + String.valueOf(r3));
-//
-//                            // Arbitrage Spread in percentage      --------> ( r2 - r3) / r3
-//                            rResult = r2.subtract(r3, MathContext.DECIMAL32);
-//                            rResult = rResult.divide(r3, MathContext.DECIMAL128);
-//                            Log.d("DATACLEAN_RESULT:\t", String.valueOf(rResult));
 
 
                             triArbitrage[z] = (100 * ((1 / cd1b.doubleValue()) * (1 / cd2b.doubleValue()) * (1 / cd3b.doubleValue())) - 100);
@@ -972,11 +948,6 @@ public class MainActivity extends AppCompatActivity {
                                 (c1Quote.equals(c2Quote) && c2Base.equals(c3Quote))
                                         && (c1Base.equals(c3Base))) {
 
-                            Log.d("DATACLEAN_PATH_4", "[" + c1 + "] [" + c2 + "] [" + c3 + "]");
-                            Log.d("DATACLEAN", "[" + exchange[chainIndex[a]] + "] [" + exchange[chainIndex[b]] + "] [" + exchange[chainIndex[c]] + "]");
-                            Log.d("DATACLEAN", "C1: [" + pairTokens[chainIndex[a]] + "]\t C2: [" + pairTokens[chainIndex[b]] + "]\t C3: [" + pairTokens[chainIndex[c]]);//                        Log.d("ArbChain", "C1: [" + pairTokens[chainIndex[a]] + "]\t C2: [" + pairTokens[chainIndex[b]] + "]\t C3: [" + pairTokens[chainIndex[c]]);
-                            Log.d("DATACLEAN", "C1: [" + bidTokens[chainIndex[a]] + "]\t C2: [" + bidTokens[chainIndex[b]] + "]\t C3: [" + bidTokens[chainIndex[c]]);
-                            Log.d("DATACLEAN", "C1: [" + askTokens[chainIndex[a]] + "]\t C2:[" + askTokens[chainIndex[b]] + "]\t C3: [" + askTokens[chainIndex[c]]);
 
 
                             triArbitrage[z] = (100 * ((1 / cd1b.doubleValue()) * (cd2a.doubleValue()) * (cd3a.doubleValue())) - 100);
