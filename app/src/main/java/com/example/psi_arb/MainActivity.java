@@ -3,9 +3,11 @@ package com.example.psi_arb;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import static android.widget.Toast.LENGTH_LONG;
 import static com.example.psi_arb.NormalizePairs.normalize;
 
 //*******************************************************************************************
@@ -58,7 +61,7 @@ import static com.example.psi_arb.NormalizePairs.normalize;
 public class MainActivity extends AppCompatActivity {
 
     private static TextView exRate;
-    private static TextView pair;
+    private static ScrollView scrollView;
 
     private static final String TAG = "";
     TextView text;
@@ -66,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
     private double x = 0;
     public int path = 0;
-    StringBuffer optimalPathText = new StringBuffer();
+    String optimalPathText;
 
     static double profitTarget = 1;
     static String[] exchange;
@@ -93,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
     // calculate the arbitrage.
     //***************************************************************
 
+    private static StringBuilder strBuilder = new StringBuilder();
 
     static String c1;
     static String c2;
@@ -146,27 +150,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Make an API connection for crypto data:
-        //
-
+        scrollView = (ScrollView) findViewById(R.id.scrollView);
         exRate = (TextView) findViewById(R.id.rate);
-        pair = (TextView) findViewById(R.id.pair);
-        btn = (Button) findViewById(R.id.btn);
+        exRate.setMovementMethod(new ScrollingMovementMethod());
+        exRate.setText("Loading Data Please Wait");
 
-        cPair.add(" ");
-        pair.setText(cPair.get(0));
+        Toast.makeText(getApplicationContext(), "Loading Data Please Wait", LENGTH_LONG).show();
 
+        getCryptoPair();
 
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                getCryptoPair();
-
-
-
-            }
-        });
 
     }
 
@@ -177,8 +169,13 @@ public class MainActivity extends AppCompatActivity {
 
 
             try {
+
+
+                z = 0;
                 getCryptoPair();
+
                 Thread.sleep(timer);
+
                 Log.d("Liquid", "test");
 
             } catch (InterruptedException e) {
@@ -192,8 +189,12 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
 
 
-            // might want to change "executed" for the returned string passed
-            // into onPostExecute() but that is upto you
+            if (strBuilder != null) {
+                exRate.setText(strBuilder.toString());
+            } else {
+                exRate.setText("Loading Data Please Wait");
+            }
+
         }
 
         @Override
@@ -207,6 +208,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void getCryptoPair() {
+
 
         RequestQueue queue = Volley.newRequestQueue(this);
 
@@ -262,7 +264,7 @@ public class MainActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(), "ERROR at " + tempPair + " " + error.toString(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "ERROR at " + tempPair + " " + error.toString(), LENGTH_LONG).show();
 
             }
         });
@@ -645,7 +647,10 @@ public class MainActivity extends AppCompatActivity {
                 && krakenPair.length < 1000 && poloniexPair.length < 1000)) {
 
 
-            timer = 60000;
+            timer = 50000;
+            if (strBuilder != null) {
+                strBuilder.delete(0, strBuilder.length());
+            }
 
 
             //************************************************************************ Exchanges
@@ -918,7 +923,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                             triArbitrage[z] = (100 * ((1 / cd1b.doubleValue()) * (1 / cd2b.doubleValue()) * (1 / cd3b.doubleValue())) - 100);
-                            path = 1;
+                            path = 8;
 
                         }
 
@@ -929,7 +934,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                             triArbitrage[z] = (100 * ((1 / cd1b.doubleValue()) * (1 / cd2b.doubleValue()) * (cd3a.doubleValue())) - 100);
-                            path = 2;
+                            path = 7;
 
                         }
 
@@ -939,7 +944,7 @@ public class MainActivity extends AppCompatActivity {
                                         && (c1Base.equals(c3Quote))) {
 
                             triArbitrage[z] = (100 * ((1 / cd1b.doubleValue()) * (cd2a.doubleValue()) * (1 / cd3b.doubleValue())) - 100);
-                            path = 3;
+                            path = 6;
 
                         }
 
@@ -951,8 +956,8 @@ public class MainActivity extends AppCompatActivity {
 
 
                             triArbitrage[z] = (100 * ((1 / cd1b.doubleValue()) * (cd2a.doubleValue()) * (cd3a.doubleValue())) - 100);
-                            path = 4;
-                            Log.d("DATACLEAN_PROFIT", String.valueOf(triArbitrage[z]));
+                            path = 5;
+//                            Log.d("DATACLEAN_PROFIT", String.valueOf(triArbitrage[z]));
 
                         }
 
@@ -963,7 +968,7 @@ public class MainActivity extends AppCompatActivity {
 
                             //               triArbitrage[z] =  (BigDecimal.valueOf(100).multiply   (   cd1a.multiply(cd2b)     ));
                             triArbitrage[z] = (100 * ((cd1a.doubleValue()) * (1 / cd2b.doubleValue()) * (1 / cd3b.doubleValue())) - 100);
-                            path = 5;
+                            path = 4;
 
                         }
 
@@ -973,7 +978,7 @@ public class MainActivity extends AppCompatActivity {
                                         && (c1Quote.equals(c3Base))) {
 
                             triArbitrage[z] = (100 * ((cd1a.doubleValue()) * (1 / cd2b.doubleValue()) * (cd3a.doubleValue())) - 100);
-                            path = 6;
+                            path = 3;
 
                         }
 
@@ -983,7 +988,7 @@ public class MainActivity extends AppCompatActivity {
                                         && (c1Quote.equals(c3Quote))) {
 
                             triArbitrage[z] = (100 * ((cd1a.doubleValue()) * (cd2a.doubleValue()) * (1 / cd3b.doubleValue())) - 100);
-                            path = 7;
+                            path = 2;
 
                         }
 
@@ -993,15 +998,49 @@ public class MainActivity extends AppCompatActivity {
                                         && (c1Quote.equals(c3Base))) {
 
                             triArbitrage[z] = (100 * ((cd1a.doubleValue()) * (cd2a.doubleValue()) * (cd3a.doubleValue())) - 100);
-                            path = 8;
+                            path = 1;
 
                         }
+
+                        optimalPathText = (
+
+                                ((path == 1) ? " SELL: [" + c1 + "] " + " SELL: [" + c2 + "] " + " SELL: [" + c3 : "]") +
+                                        ((path == 2) ? " SELL: [" + c1 + "] " + " SELL: [" + c2 + "] " + " BUY: [" + c3 : "]") +
+                                        ((path == 3) ? " SELL: [" + c1 + "] " + " BUY: [" + c2 + "] " + " SELL: [" + c3 : "]") +
+                                        ((path == 4) ? " SELL: [" + c1 + "] " + " BUY: [" + c2 + "] " + " BUY: [" + c3 : "]") +
+                                        ((path == 5) ? " BUY: [" + c1 + "] " + " SELL: [" + c2 + "] " + " SELL: [" + c3 : "]") +
+                                        ((path == 6) ? " BUY: [" + c1 + "] " + " SELL: [" + c2 + "] " + " BUY: [" + c3 : "]") +
+                                        ((path == 7) ? " BUY: [" + c1 + "] " + " BUY: [" + c2 + "] " + " SELL: [" + c3 : "]") +
+                                        ((path == 8) ? " BUY: [" + c1 + "] " + " BUY: [" + c2 + "] " + " BUY: [" + c3 : "]")
+
+                        );
 
 
                         //***********************************************************
 
-                        Log.d("ArbPROFIT", String.valueOf(triArbitrage[z]) + " \t PATH:" + path);
+                        if (triArbitrage[z] > 1 && exchange[chainIndex[a]].equals(exchange[chainIndex[b]])
+                                && exchange[chainIndex[b]].equals(exchange[chainIndex[c]])) {
 
+                            triArbitrage[z] = (double) Math.round(triArbitrage[z].doubleValue() * 1000d) / 1000d;
+
+
+                            strBuilder.append("[" + c1 + "]\t [" + c2 + "]\t [" + c3 + "]\n");
+                            strBuilder.append("[" + exchange[chainIndex[a]] + "] [" + exchange[chainIndex[b]] + "] [" + exchange[chainIndex[c]] + "]\n");
+                            strBuilder.append(optimalPathText + "\n");
+                            //  strBuilder.append("Trade 1: [" + pairTokens[chainIndex[a]] + "]\t Trade 2: [" + pairTokens[chainIndex[b]] + "]\t Trade 3: [" + pairTokens[chainIndex[c]] + "]\n");
+                            strBuilder.append("Bid: [" + bidTokens[chainIndex[a]] + "]\t Bid: [" + bidTokens[chainIndex[b]] + "]\t Bid: [" + bidTokens[chainIndex[c]] + "]\n");
+                            strBuilder.append("Ask: [" + askTokens[chainIndex[a]] + "]\t Ask:[" + askTokens[chainIndex[b]] + "]\t Ask: [" + askTokens[chainIndex[c]] + "]\n");
+                            strBuilder.append("Arb Spread: [ " + triArbitrage[z].toString() + "% ] \t CHAIN:" + path + "\n\n");
+
+
+                            Log.d("ArbPROFIT", "[" + c1 + "] [" + c2 + "] [" + c3 + "]");
+                            Log.d("ArbPROFIT", "[" + exchange[chainIndex[a]] + "] [" + exchange[chainIndex[b]] + "] [" + exchange[chainIndex[c]] + "]");
+                            Log.d("ArbPROFIT", "C1: [" + pairTokens[chainIndex[a]] + "]\t C2: [" + pairTokens[chainIndex[b]] + "]\t C3: [" + pairTokens[chainIndex[c]] + "]");//                        Log.d("ArbChain", "C1: [" + pairTokens[chainIndex[a]] + "]\t C2: [" + pairTokens[chainIndex[b]] + "]\t C3: [" + pairTokens[chainIndex[c]]);
+                            Log.d("ArbPROFIT", "C1: [" + bidTokens[chainIndex[a]] + "]\t C2: [" + bidTokens[chainIndex[b]] + "]\t C3: [" + bidTokens[chainIndex[c]] + "]");
+                            Log.d("ArbPROFIT", "C1: [" + askTokens[chainIndex[a]] + "]\t C2:[" + askTokens[chainIndex[b]] + "]\t C3: [" + askTokens[chainIndex[c]] + "]");
+                            Log.d("ArbPROFIT", String.valueOf(triArbitrage[z]) + " \t PATH:" + path + "\n****");
+
+                        }
 
                     }
 
