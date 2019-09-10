@@ -35,7 +35,7 @@
                 android:shadowColor="@color/joelParizi"
                 android:shadowDx="1"
                 android:shadowDy="1"
-                android:shadowRadius=" "
+                android:shadowRadius="2"
                 android:text="EXCHANGE RATE"
                 android:textColor="@color/colorPrimary"
                 android:textSize="10sp" />

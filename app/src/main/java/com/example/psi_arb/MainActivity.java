@@ -758,12 +758,14 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case "DASH":
                 return true;
-            case "ZEC":
-                return true;
-            case "QTUM":
-                return true;
-            case "ATOM":
-                return true;
+//            case "ZEC":
+//                return true;
+//            case "QTUM":
+//                return true;
+//            case "ATOM":
+//                return true;
+//            case "USDC":
+//                return true;
 
         }
 
@@ -916,7 +918,6 @@ public class MainActivity extends AppCompatActivity {
 //                        Log.d("DATACLEAN", "C1: [" + askTokens[chainIndex[a]] + "]\t C2:[" + askTokens[chainIndex[b]] + "]\t C3: [" + askTokens[chainIndex[c]]);
 
 
-
                         if (  // Path 1
                                 (c1Quote.equals(c2Base) && c2Quote.equals(c3Base))
                                         && (c1Base.equals(c3Quote))) {
@@ -928,57 +929,145 @@ public class MainActivity extends AppCompatActivity {
                         }
 
 
-                        if (   // Path 2
+                        if (   // CHAIN 2
                                 (c1Quote.equals(c2Base) && c2Quote.equals(c3Quote))
                                         && (c1Base.equals(c3Base))) {
 
 
-                            triArbitrage[z] = (100 * ((1 / cd1b.doubleValue()) * (1 / cd2b.doubleValue()) * (cd3a.doubleValue())) - 100);
-                            path = 7;
+                            if (cd1b.doubleValue() > (1 / cd2b.doubleValue()) * cd3a.doubleValue()) {
+                                // Transitivity is bigger than the Implied Synthetic Cross-Rate
+
+                                triArbitrage[z] = maxBet * cd1b.doubleValue(); // SELL
+                                triArbitrage[z] = triArbitrage[z] * cd2b.doubleValue(); // SELL
+                                triArbitrage[z] = triArbitrage[z] / cd3a.doubleValue(); // BUY
+
+                                path = 2;
+
+                            } else if (cd1a.doubleValue() < (1 / cd2a.doubleValue()) * cd3b.doubleValue()) {
+                                // Transitivity is bigger than the Implied Synthetic Cross-Rate
+
+                                triArbitrage[z] = maxBet * cd3b.doubleValue(); // SELL
+                                System.out.println(triArbitrage[z]);
+                                triArbitrage[z] = triArbitrage[z] / cd2a.doubleValue(); // BUY
+                                System.out.println(triArbitrage[z]);
+                                triArbitrage[z] = triArbitrage[z] / cd1a.doubleValue(); // BUY
+                                System.out.println(triArbitrage[z]);
+
+                                path = 12;
+
+                            }
 
                         }
 
 
-                        if (   // Path 3
+                        if (   // CHAIN 3
                                 (c1Quote.equals(c2Quote) && c2Base.equals(c3Base))
                                         && (c1Base.equals(c3Quote))) {
 
-                            triArbitrage[z] = (100 * ((1 / cd1b.doubleValue()) * (cd2a.doubleValue()) * (1 / cd3b.doubleValue())) - 100);
-                            path = 6;
+
+                            if (cd1b.doubleValue() > cd2a.doubleValue() * (1 / cd3b.doubleValue())) {
+                                // Transitivity is bigger than the Implied Synthetic Cross-Rate
+
+                                triArbitrage[z] = maxBet * cd1b.doubleValue(); // SELL
+                                triArbitrage[z] = triArbitrage[z] / cd2a.doubleValue(); // BUY
+                                triArbitrage[z] = triArbitrage[z] * cd3b.doubleValue(); // SELL
+
+                                path = 3;
+
+                            } else if (cd1a.doubleValue() < cd2b.doubleValue() * (1 / cd3a.doubleValue())) {
+                                // Transitivity is bigger than the Implied Synthetic Cross-Rate
+
+                                triArbitrage[z] = maxBet / cd3a.doubleValue(); // BUY
+                                triArbitrage[z] = triArbitrage[z] * cd2b.doubleValue(); // SELL
+                                triArbitrage[z] = triArbitrage[z] / cd1a.doubleValue(); // BUY
+
+                                path = 14;
+
+                            }
+
 
                         }
 
 
-                        if (// Path 4
+                        if (// CHAIN 4
                                 (c1Quote.equals(c2Quote) && c2Base.equals(c3Quote))
                                         && (c1Base.equals(c3Base))) {
 
+                            if (cd1b.doubleValue() > (cd2a.doubleValue() * cd3a.doubleValue())) {
+                                // Transitivity is bigger than the Implied Synthetic Cross-Rate
 
 
-                            triArbitrage[z] = (100 * ((1 / cd1b.doubleValue()) * (cd2a.doubleValue()) * (cd3a.doubleValue())) - 100);
-                            path = 5;
-//                            Log.d("DATACLEAN_PROFIT", String.valueOf(triArbitrage[z]));
+                                triArbitrage[z] = maxBet * cd1b.doubleValue(); // SELL
+                                triArbitrage[z] = triArbitrage[z] / cd2a.doubleValue(); // BUY
+                                triArbitrage[z] = triArbitrage[z] / cd3a.doubleValue(); // BUY
+
+                                path = 4;
+
+                            } else if (cd1a.doubleValue() < (cd2b.doubleValue() * cd3b.doubleValue())) {
+                                // Transitivity is bigger than the Implied Synthetic Cross-Rate
+
+
+                                triArbitrage[z] = maxBet * cd3b.doubleValue(); // SELL
+                                triArbitrage[z] = triArbitrage[z] * cd2b.doubleValue(); // SELL
+                                triArbitrage[z] = triArbitrage[z] / cd1a.doubleValue(); // BUY
+
+                                path = 10;
+
+                            }
 
                         }
 
-
-                        if (   // Path 5
+                        if (   // CHAIN 5
                                 (c1Base.equals(c2Base) && c2Quote.equals(c3Base))
                                         && (c1Quote.equals(c3Quote))) {
 
-                            //               triArbitrage[z] =  (BigDecimal.valueOf(100).multiply   (   cd1a.multiply(cd2b)     ));
-                            triArbitrage[z] = (100 * ((cd1a.doubleValue()) * (1 / cd2b.doubleValue()) * (1 / cd3b.doubleValue())) - 100);
-                            path = 4;
+
+                            if (cd1a.doubleValue() < (cd2b.doubleValue() * cd3b.doubleValue())) {
+                                // Transitivity is bigger than the Implied Synthetic Cross-Rate
+
+                                triArbitrage[z] = maxBet / cd1a.doubleValue(); // BUY
+                                triArbitrage[z] = triArbitrage[z] * cd2b.doubleValue(); // SELL
+                                triArbitrage[z] = triArbitrage[z] * cd3b.doubleValue(); // SELL
+
+                                path = 5;
+
+                            } else if (cd1b.doubleValue() > (cd2a.doubleValue() * cd3a.doubleValue())) {
+                                // Transitivity is bigger than the Implied Synthetic Cross-Rate
+
+                                triArbitrage[z] = maxBet / cd3a.doubleValue(); // BUY
+                                triArbitrage[z] = triArbitrage[z] / cd2a.doubleValue(); // BUY
+                                triArbitrage[z] = triArbitrage[z] * cd1b.doubleValue(); // SELL
+
+                                path = 15;
+
+                            }
 
                         }
 
-
-                        if (   // Path 6
+                        if (   // CHAIN 6
                                 (c1Base.equals(c2Base) && c2Quote.equals(c3Quote))
                                         && (c1Quote.equals(c3Base))) {
 
-                            triArbitrage[z] = (100 * ((cd1a.doubleValue()) * (1 / cd2b.doubleValue()) * (cd3a.doubleValue())) - 100);
-                            path = 3;
+//
+                            if (cd1b.doubleValue() > (cd2a.doubleValue() * (1 / cd3b.doubleValue()))) {
+
+                                // Transitivity is bigger than the Implied Synthetic Cross-Rate
+
+                                triArbitrage[z] = maxBet * cd3b.doubleValue(); // SELL
+                                triArbitrage[z] = triArbitrage[z] / cd2a.doubleValue(); // BUY
+                                triArbitrage[z] = triArbitrage[z] * cd1b.doubleValue(); // SELL
+
+                                path = 11;
+
+                            } else if (cd1a.doubleValue() < (cd2b.doubleValue() * (1 / cd3a.doubleValue()))) {
+                                // Transitivity is smaller than the Implied Synthetic Cross-Rate
+
+                                triArbitrage[z] = maxBet / cd1a.doubleValue(); // BUY
+                                triArbitrage[z] = triArbitrage[z] * cd2b.doubleValue(); // SELL
+                                triArbitrage[z] = triArbitrage[z] / cd3a.doubleValue(); // BUY
+                                path = 6;
+
+                            }
 
                         }
 
@@ -1004,22 +1093,39 @@ public class MainActivity extends AppCompatActivity {
 
                         optimalPathText = (
 
-                                ((path == 1) ? " SELL: [" + c1 + "] " + " SELL: [" + c2 + "] " + " SELL: [" + c3 : "]") +
-                                        ((path == 2) ? " SELL: [" + c1 + "] " + " SELL: [" + c2 + "] " + " BUY: [" + c3 : "]") +
-                                        ((path == 3) ? " SELL: [" + c1 + "] " + " BUY: [" + c2 + "] " + " SELL: [" + c3 : "]") +
-                                        ((path == 4) ? " SELL: [" + c1 + "] " + " BUY: [" + c2 + "] " + " BUY: [" + c3 : "]") +
-                                        ((path == 5) ? " BUY: [" + c1 + "] " + " SELL: [" + c2 + "] " + " SELL: [" + c3 : "]") +
-                                        ((path == 6) ? " BUY: [" + c1 + "] " + " SELL: [" + c2 + "] " + " BUY: [" + c3 : "]") +
-                                        ((path == 7) ? " BUY: [" + c1 + "] " + " BUY: [" + c2 + "] " + " SELL: [" + c3 : "]") +
-                                        ((path == 8) ? " BUY: [" + c1 + "] " + " BUY: [" + c2 + "] " + " BUY: [" + c3 : "]")
+                                //CLOCKWISE
+
+                                ((path == 1) ? " SELL: " + c1 + " " + " SELL: " + c2 + " " + " SELL: " + c3 : "")
+                                        + ((path == 2) ? " SELL: " + c1 + " " + " SELL: " + c2 + " " + " BUY: " + c3 : "")
+                                        + ((path == 3) ? " SELL: " + c1 + " " + " BUY: " + c2 + " " + " SELL: " + c3 : "")
+                                        + ((path == 4) ? " SELL: " + c1 + " " + " BUY: " + c2 + " " + " BUY: " + c3 : "")
+                                        + ((path == 5) ? " BUY: " + c1 + " " + " SELL: " + c2 + " " + " SELL: " + c3 : "")
+                                        + ((path == 6) ? " BUY: " + c1 + " " + " SELL: " + c2 + " " + " BUY: " + c3 : "")
+                                        + ((path == 7) ? " BUY: " + c1 + " " + " BUY: " + c2 + " " + " SELL: " + c3 : "")
+                                        + ((path == 8) ? " BUY: " + c1 + " " + " BUY: " + c2 + " " + " BUY: " + c3 : "")
+
+                                        //COUNTER-CLOCKWISE
+
+                                        + ((path == 9) ? " SELL: " + c3 + " " + " SELL: " + c2 + " " + " SELL: " + c1 : "")
+                                        + ((path == 10) ? " SELL: " + c3 + " " + " SELL: " + c2 + " " + " BUY: " + c1 : "")
+                                        + ((path == 11) ? " SELL: " + c3 + " " + " BUY: " + c2 + " " + " SELL: " + c1 : "")
+                                        + ((path == 12) ? " SELL: " + c3 + " " + " BUY: " + c2 + " " + " BUY: " + c1 : "")
+                                        + ((path == 13) ? " BUY: " + c3 + " " + " SELL: " + c2 + " " + " SELL: " + c1 : "")
+                                        + ((path == 14) ? " BUY: " + c3 + " " + " SELL: " + c2 + " " + " BUY: " + c1 : "")
+                                        + ((path == 15) ? " BUY: " + c3 + " " + " BUY: " + c2 + " " + " SELL: " + c1 : "")
+                                        + ((path == 16) ? " BUY: " + c3 + " " + " BUY: " + c2 + " " + " BUY: " + c1 : "")
 
                         );
 
-
                         //***********************************************************
 
-                        if (triArbitrage[z] > 1 && exchange[chainIndex[a]].equals(exchange[chainIndex[b]])
-                                && exchange[chainIndex[b]].equals(exchange[chainIndex[c]])) {
+                        if (triArbitrage[z] > 1 &&
+
+//                                exchange[chainIndex[a]].equals(exchange[chainIndex[b]])
+//                                && exchange[chainIndex[b]].equals(exchange[chainIndex[c]]))
+
+                                exchange[chainIndex[a]].equals("Poloniex") && exchange[chainIndex[b]].equals("Poloniex")
+                                && exchange[chainIndex[c]].equals("Poloniex")) {
 
                             triArbitrage[z] = (double) Math.round(triArbitrage[z].doubleValue() * 1000d) / 1000d;
 
@@ -1036,8 +1142,8 @@ public class MainActivity extends AppCompatActivity {
                             Log.d("ArbPROFIT", "[" + c1 + "] [" + c2 + "] [" + c3 + "]");
                             Log.d("ArbPROFIT", "[" + exchange[chainIndex[a]] + "] [" + exchange[chainIndex[b]] + "] [" + exchange[chainIndex[c]] + "]");
                             Log.d("ArbPROFIT", "C1: [" + pairTokens[chainIndex[a]] + "]\t C2: [" + pairTokens[chainIndex[b]] + "]\t C3: [" + pairTokens[chainIndex[c]] + "]");//                        Log.d("ArbChain", "C1: [" + pairTokens[chainIndex[a]] + "]\t C2: [" + pairTokens[chainIndex[b]] + "]\t C3: [" + pairTokens[chainIndex[c]]);
-                            Log.d("ArbPROFIT", "C1: [" + bidTokens[chainIndex[a]] + "]\t C2: [" + bidTokens[chainIndex[b]] + "]\t C3: [" + bidTokens[chainIndex[c]] + "]");
                             Log.d("ArbPROFIT", "C1: [" + askTokens[chainIndex[a]] + "]\t C2:[" + askTokens[chainIndex[b]] + "]\t C3: [" + askTokens[chainIndex[c]] + "]");
+                            Log.d("ArbPROFIT", "C1: [" + bidTokens[chainIndex[a]] + "]\t C2: [" + bidTokens[chainIndex[b]] + "]\t C3: [" + bidTokens[chainIndex[c]] + "]");
                             Log.d("ArbPROFIT", String.valueOf(triArbitrage[z]) + " \t PATH:" + path + "\n****");
 
                         }
