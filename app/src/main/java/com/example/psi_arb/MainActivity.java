@@ -70,11 +70,12 @@ public class MainActivity extends AppCompatActivity {
     private double x = 0;
     public int path = 0;
     String optimalPathText;
+    private static double maxBet = 100;
 
     static double profitTarget = 1;
     static String[] exchange;
 
-    private static int timer = 1000;
+    private static int timer = 1500;
     private static int[] chainIndex;
     private static ArrayList<String[]> arbChain = new ArrayList<>();
 
@@ -84,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
     public static BigDecimal cd2a = new BigDecimal(0);
     public static BigDecimal cd3b = new BigDecimal(0);
     public static BigDecimal cd3a = new BigDecimal(0);
-    Double triArbitrage[] = new Double[10000000];
+    Double triArbitrage = 0d;
     //ArrayList<Double> triArbitrage = new ArrayList<>();
     private static String tempPair;
 
@@ -138,12 +139,15 @@ public class MainActivity extends AppCompatActivity {
     private static String[] krakenPair = new String[1000];
     private static BigDecimal[] krakenBid = new BigDecimal[1000];
     private static BigDecimal[] krakenAsk = new BigDecimal[1000];
-    private static BigDecimal[] krakenVolume = new BigDecimal[1000];
 
     static String[] poloniexPair = new String[1000];
     private static BigDecimal[] poloniexBid = new BigDecimal[1000];
     private static BigDecimal[] poloniexAsk = new BigDecimal[1000];
-    private static BigDecimal[] poloniexVolume = new BigDecimal[1000];
+
+    static String[] bitMartPair = new String[1000];
+    private static BigDecimal[] bitMartBid = new BigDecimal[1000];
+    private static BigDecimal[] bitMartAsk = new BigDecimal[1000];
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,11 +158,8 @@ public class MainActivity extends AppCompatActivity {
         exRate = (TextView) findViewById(R.id.rate);
         exRate.setMovementMethod(new ScrollingMovementMethod());
         exRate.setText("Loading Data Please Wait");
-
         Toast.makeText(getApplicationContext(), "Loading Data Please Wait", LENGTH_LONG).show();
-
         getCryptoPair();
-
 
     }
 
@@ -167,16 +168,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
 
-
             try {
-
 
                 z = 0;
                 getCryptoPair();
-
                 Thread.sleep(timer);
-
-                Log.d("Liquid", "test");
 
             } catch (InterruptedException e) {
                 Thread.interrupted();
@@ -207,13 +203,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void getCryptoPair() {
+    // *********************************************
+    //  REST api public end points to parse exchange rates
+    //  in JSON format
+    //**********************************************
 
+    //https://api.hitbtc.com/api/2/public/ticker
+    //https://apiv2.bitz.com/Market/tickerall
+    //https://api.liquid.com/products
+    //https://api.huobi.pro/market/tickers
+    //https://api.bithumb.com/public/ticker/ALL
+    //https://openapi-v2.kucoin.com/api/v1/market/allTickers
+    //https://api.gemini.com/v1/pubticker/btcusd
+    private void getCryptoPair() {
 
         RequestQueue queue = Volley.newRequestQueue(this);
 
         //Bitfinex ************************
         String URL = "https://api-pub.bitfinex.com/v2/tickers?symbols=ALL";
+
+
         JsonArrayRequest jsonArr_bitfinex = new JsonArrayRequest(Request.Method.GET, URL, null, new Response.Listener<JSONArray>() {
 
 
@@ -222,11 +231,9 @@ public class MainActivity extends AppCompatActivity {
 
                 Log.d("Response: ", response.toString());
 
-
                 bitfinexPair = new String[417];
                 bitfinexAsk = new BigDecimal[417];
                 bitfinexxBid = new BigDecimal[417];
-
 
                 Log.d("COOLSPOT3", String.valueOf(response.length()));
 
@@ -236,8 +243,6 @@ public class MainActivity extends AppCompatActivity {
                     try {
 
                         JSONArray innerArr = response.getJSONArray(i);
-
-
                         bitfinexxBid[i] = BigDecimal.valueOf(Double.parseDouble(innerArr.getString(1)));
                         bitfinexAsk[i] = BigDecimal.valueOf(Double.parseDouble(innerArr.getString(3)));
                         bitfinexVolume[i] = BigDecimal.valueOf(Double.parseDouble(innerArr.getString(8)));
@@ -247,7 +252,6 @@ public class MainActivity extends AppCompatActivity {
                         String base = bitfinexPair[i].substring(1, 4);
                         String quote = bitfinexPair[i].substring(4, bitfinexPair[i].length());
                         bitfinexPair[i] = base + "_" + quote;
-
 
                         Log.d("BITFINEX", bitfinexPair.length + "i:" + i + " " + (bitfinexPair[i]) + " " + bitfinexxBid[i].toString() + " " + bitfinexAsk[i].toString() + " " + bitfinexVolume[i].toString());
 
@@ -275,9 +279,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(JSONObject response) {
 
-
                 try {
-
 
                     JSONArray metadataArr = response.getJSONArray("result");
 
@@ -287,14 +289,12 @@ public class MainActivity extends AppCompatActivity {
 
                     for (int i = 0; i < metadataArr.length(); i++) {
 
-
                         JSONObject obj = metadataArr.getJSONObject(i);
 
                         bittrexBid[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("Bid")));
                         bittrexAsk[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("Ask")));
                         bittrexVolume[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("BaseVolume")));
                         //  bittrexPair[i] = obj.getString("MarketName");
-
 
                         String flip = obj.getString("MarketName");
                         int flipInt = flip.indexOf("-");
@@ -307,7 +307,6 @@ public class MainActivity extends AppCompatActivity {
                         bittrexPair[i] = bittrexPair[i].replace("-", "_");
 
                         Log.d("BittrexSet", bittrexPair.length + " " + bittrexPair[i] + bittrexVolume[i].toString());
-
 
                     }
 
@@ -340,7 +339,6 @@ public class MainActivity extends AppCompatActivity {
                 binanceAsk = new BigDecimal[response.length()];
                 binanceBid = new BigDecimal[response.length()];
 
-
                 try {
 
                     for (int i = 0; i < response.length(); i++) {
@@ -349,14 +347,11 @@ public class MainActivity extends AppCompatActivity {
                         binanceAsk[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("askPrice")));
                         binanceBid[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("bidPrice")));
                         binanceVolume[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("bidQty")));
-
                         NormalizePairs normalizer = new NormalizePairs();
-
 
                         //Normalize data
                         String str = binancePair[i];
                         normalize(str, i);
-
 
                         if (binancePair[i].length() < 6) {
                             //Normalize data
@@ -427,14 +422,11 @@ public class MainActivity extends AppCompatActivity {
                                 + " " + okexPair[i].toString() + " " + okexBid[i].toString() + " "
                                 + okexAsk[i].toString() + " " + okexVolume[i].toString());
 
-
                     }
-
 
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
 
             }
         }, new Response.ErrorListener() {
@@ -605,6 +597,43 @@ public class MainActivity extends AppCompatActivity {
 
         queue.add(poloniexFeed);
 
+        URL = "https://openapi.bitmart.com/v2/ticker";
+
+        JsonArrayRequest bitMart = new JsonArrayRequest(Request.Method.GET, URL, null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+
+                try {
+                    JSONObject bitmart;
+
+
+                    for(int i =0; i < response.length(); i++) {
+
+                        bitmart = (JSONObject) response.get(i);
+                        String pair = (String) bitmart.get("symbol_id");
+                        String bid = (String) bitmart.get("bid_1");
+                        String ask = (String) bitmart.get("ask_1");
+
+                        System.out.println("BITMART" + pair +  bitmart.toString());
+                    }
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+        queue.add(bitMart);
 
         //******************************************************************** JSON Parsing Complete
         //
@@ -613,7 +642,6 @@ public class MainActivity extends AppCompatActivity {
         String[] pairTokens = {};
         BigDecimal[] bidTokens = {};
         BigDecimal[] askTokens = {};
-
 
         pairTokens = concatenate(pairTokens, bitfinexPair);
         pairTokens = concatenate(pairTokens, bittrexPair);
@@ -717,11 +745,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void assignExchange(String[] str) {
-
-
-    }
-
     private static boolean liquidCheck(String str) {
 
         switch (str) {
@@ -733,6 +756,8 @@ public class MainActivity extends AppCompatActivity {
             case "USDT":
                 return true;
             case "LTC":
+                return true;
+            case "REP":
                 return true;
             case "BCH":
                 return true;
@@ -746,7 +771,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case "ADA":
                 return true;
-            case "TRON":
+            case "NEO":
                 return true;
             case "XMR":
                 return true;
@@ -754,27 +779,43 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case "TRX":
                 return true;
+            case "JPY":
+                return true;
+            case "EUR":
+                return true;
+            case "GBP":
+                return true;
             case "ETC":
                 return true;
             case "DASH":
                 return true;
-//            case "ZEC":
-//                return true;
-//            case "QTUM":
-//                return true;
-//            case "ATOM":
-//                return true;
-//            case "USDC":
-//                return true;
+            case "ZEC":
+                return true;
+            case "QTUM":
+                return true;
+            case "ATOM":
+                return true;
+            case "USDC":
+                return true;
+            case "HT":
+                return true;
+            case "BEAM":
+                return true;
+            case "NEM":
+                return true;
+            case "DOGE":
+                return true;
+            case "LAMB":
+                return true;
+            case "BTT":
+                return true;
+            case "DAI":
+                return true;
+
 
         }
 
         return false;
-    }
-
-    public static boolean arbChain() {
-
-        return true;
     }
 
     public void arbitrage(String[] pairTokens, String[] baseTokens, String[] quoteTokens, BigDecimal[] bidTokens, BigDecimal[] askTokens) {
@@ -782,7 +823,7 @@ public class MainActivity extends AppCompatActivity {
 
         String base[] = baseTokens;
         String quote[] = pairTokens;
-
+        strBuilder.delete(0, strBuilder.length());
         List<String> currencyList = Arrays.asList(baseTokens);
         Set<String> currList = new HashSet<String>(currencyList);
 
@@ -888,11 +929,10 @@ public class MainActivity extends AppCompatActivity {
 
                         //  arbChain.add(c1 + " " + c2 + " " + c3);
 
-                        int timer = 60000;
+                        timer = 50000;
                         new LongOperation().execute();
 
 
-                        Log.d("CHAINS", "[" + c1 + "] [" + c2 + "] [" + c3 + "]");
                         Log.d("CHAINS", "[" + exchange[chainIndex[a]] + "] [" + exchange[chainIndex[b]] + "] [" + exchange[chainIndex[c]] + "]");
                         Log.d("CHAINS", "C1: [" + pairTokens[chainIndex[a]] + "]\t C2: [" + pairTokens[chainIndex[b]] + "]\t C3: [" + pairTokens[chainIndex[c]]);//                        Log.d("ArbChain", "C1: [" + pairTokens[chainIndex[a]] + "]\t C2: [" + pairTokens[chainIndex[b]] + "]\t C3: [" + pairTokens[chainIndex[c]]);
                         Log.d("CHAINS", "C1: [" + bidTokens[chainIndex[a]] + "]\t C2: [" + bidTokens[chainIndex[b]] + "]\t C3: [" + bidTokens[chainIndex[c]]);
@@ -918,13 +958,33 @@ public class MainActivity extends AppCompatActivity {
 //                        Log.d("DATACLEAN", "C1: [" + askTokens[chainIndex[a]] + "]\t C2:[" + askTokens[chainIndex[b]] + "]\t C3: [" + askTokens[chainIndex[c]]);
 
 
-                        if (  // Path 1
+                        if (  // CHAIN 1
                                 (c1Quote.equals(c2Base) && c2Quote.equals(c3Base))
                                         && (c1Base.equals(c3Quote))) {
 
 
-                            triArbitrage[z] = (100 * ((1 / cd1b.doubleValue()) * (1 / cd2b.doubleValue()) * (1 / cd3b.doubleValue())) - 100);
-                            path = 8;
+                            if (cd1b.doubleValue() > (1 / cd2b.doubleValue()) * (1 / cd3b.doubleValue())) {
+                                // Transitivity is bigger than the Implied Synthetic Cross-Rate (CLOCKWISE)
+
+                                triArbitrage = maxBet * cd1b.doubleValue(); // SELL
+                                triArbitrage = triArbitrage * cd2b.doubleValue(); // SELL
+                                triArbitrage = triArbitrage * cd3b.doubleValue(); // SELL
+
+                                path = 1;
+
+                            } else if (cd1a.doubleValue() < (1 / cd2a.doubleValue()) * (1 / cd3a.doubleValue())) {
+                                // Transitivity is smaller than the Implied Synthetic Cross-Rate (COUNTER-CLOCKWISE)
+
+
+                                triArbitrage = maxBet / cd3a.doubleValue(); // BUY
+                                triArbitrage = triArbitrage / cd2a.doubleValue(); // BUY
+                                triArbitrage = triArbitrage / cd1a.doubleValue(); // BUY
+                                path = 16;
+
+                            } else {
+                                triArbitrage = Double.valueOf(0);
+                            }
+
 
                         }
 
@@ -937,24 +997,23 @@ public class MainActivity extends AppCompatActivity {
                             if (cd1b.doubleValue() > (1 / cd2b.doubleValue()) * cd3a.doubleValue()) {
                                 // Transitivity is bigger than the Implied Synthetic Cross-Rate
 
-                                triArbitrage[z] = maxBet * cd1b.doubleValue(); // SELL
-                                triArbitrage[z] = triArbitrage[z] * cd2b.doubleValue(); // SELL
-                                triArbitrage[z] = triArbitrage[z] / cd3a.doubleValue(); // BUY
+                                triArbitrage = maxBet * cd1b.doubleValue(); // SELL
+                                triArbitrage = triArbitrage * cd2b.doubleValue(); // SELL
+                                triArbitrage = triArbitrage / cd3a.doubleValue(); // BUY
 
                                 path = 2;
 
                             } else if (cd1a.doubleValue() < (1 / cd2a.doubleValue()) * cd3b.doubleValue()) {
                                 // Transitivity is bigger than the Implied Synthetic Cross-Rate
 
-                                triArbitrage[z] = maxBet * cd3b.doubleValue(); // SELL
-                                System.out.println(triArbitrage[z]);
-                                triArbitrage[z] = triArbitrage[z] / cd2a.doubleValue(); // BUY
-                                System.out.println(triArbitrage[z]);
-                                triArbitrage[z] = triArbitrage[z] / cd1a.doubleValue(); // BUY
-                                System.out.println(triArbitrage[z]);
+                                triArbitrage = maxBet * cd3b.doubleValue(); // SELL
+                                triArbitrage = triArbitrage / cd2a.doubleValue(); // BUY
+                                triArbitrage = triArbitrage / cd1a.doubleValue(); // BUY
 
                                 path = 12;
 
+                            } else {
+                                triArbitrage = Double.valueOf(0);
                             }
 
                         }
@@ -968,21 +1027,23 @@ public class MainActivity extends AppCompatActivity {
                             if (cd1b.doubleValue() > cd2a.doubleValue() * (1 / cd3b.doubleValue())) {
                                 // Transitivity is bigger than the Implied Synthetic Cross-Rate
 
-                                triArbitrage[z] = maxBet * cd1b.doubleValue(); // SELL
-                                triArbitrage[z] = triArbitrage[z] / cd2a.doubleValue(); // BUY
-                                triArbitrage[z] = triArbitrage[z] * cd3b.doubleValue(); // SELL
+                                triArbitrage = maxBet * cd1b.doubleValue(); // SELL
+                                triArbitrage = triArbitrage / cd2a.doubleValue(); // BUY
+                                triArbitrage = triArbitrage * cd3b.doubleValue(); // SELL
 
                                 path = 3;
 
                             } else if (cd1a.doubleValue() < cd2b.doubleValue() * (1 / cd3a.doubleValue())) {
                                 // Transitivity is bigger than the Implied Synthetic Cross-Rate
 
-                                triArbitrage[z] = maxBet / cd3a.doubleValue(); // BUY
-                                triArbitrage[z] = triArbitrage[z] * cd2b.doubleValue(); // SELL
-                                triArbitrage[z] = triArbitrage[z] / cd1a.doubleValue(); // BUY
+                                triArbitrage = maxBet / cd3a.doubleValue(); // BUY
+                                triArbitrage = triArbitrage * cd2b.doubleValue(); // SELL
+                                triArbitrage = triArbitrage / cd1a.doubleValue(); // BUY
 
                                 path = 14;
 
+                            } else {
+                                triArbitrage = Double.valueOf(0);
                             }
 
 
@@ -997,9 +1058,9 @@ public class MainActivity extends AppCompatActivity {
                                 // Transitivity is bigger than the Implied Synthetic Cross-Rate
 
 
-                                triArbitrage[z] = maxBet * cd1b.doubleValue(); // SELL
-                                triArbitrage[z] = triArbitrage[z] / cd2a.doubleValue(); // BUY
-                                triArbitrage[z] = triArbitrage[z] / cd3a.doubleValue(); // BUY
+                                triArbitrage = maxBet * cd1b.doubleValue(); // SELL
+                                triArbitrage = triArbitrage / cd2a.doubleValue(); // BUY
+                                triArbitrage = triArbitrage / cd3a.doubleValue(); // BUY
 
                                 path = 4;
 
@@ -1007,12 +1068,14 @@ public class MainActivity extends AppCompatActivity {
                                 // Transitivity is bigger than the Implied Synthetic Cross-Rate
 
 
-                                triArbitrage[z] = maxBet * cd3b.doubleValue(); // SELL
-                                triArbitrage[z] = triArbitrage[z] * cd2b.doubleValue(); // SELL
-                                triArbitrage[z] = triArbitrage[z] / cd1a.doubleValue(); // BUY
+                                triArbitrage = maxBet * cd3b.doubleValue(); // SELL
+                                triArbitrage = triArbitrage * cd2b.doubleValue(); // SELL
+                                triArbitrage = triArbitrage / cd1a.doubleValue(); // BUY
 
                                 path = 10;
 
+                            } else {
+                                triArbitrage = Double.valueOf(0);
                             }
 
                         }
@@ -1025,21 +1088,23 @@ public class MainActivity extends AppCompatActivity {
                             if (cd1a.doubleValue() < (cd2b.doubleValue() * cd3b.doubleValue())) {
                                 // Transitivity is bigger than the Implied Synthetic Cross-Rate
 
-                                triArbitrage[z] = maxBet / cd1a.doubleValue(); // BUY
-                                triArbitrage[z] = triArbitrage[z] * cd2b.doubleValue(); // SELL
-                                triArbitrage[z] = triArbitrage[z] * cd3b.doubleValue(); // SELL
+                                triArbitrage = maxBet / cd1a.doubleValue(); // BUY
+                                triArbitrage = triArbitrage * cd2b.doubleValue(); // SELL
+                                triArbitrage = triArbitrage * cd3b.doubleValue(); // SELL
 
                                 path = 5;
 
                             } else if (cd1b.doubleValue() > (cd2a.doubleValue() * cd3a.doubleValue())) {
                                 // Transitivity is bigger than the Implied Synthetic Cross-Rate
 
-                                triArbitrage[z] = maxBet / cd3a.doubleValue(); // BUY
-                                triArbitrage[z] = triArbitrage[z] / cd2a.doubleValue(); // BUY
-                                triArbitrage[z] = triArbitrage[z] * cd1b.doubleValue(); // SELL
+                                triArbitrage = maxBet / cd3a.doubleValue(); // BUY
+                                triArbitrage = triArbitrage / cd2a.doubleValue(); // BUY
+                                triArbitrage = triArbitrage * cd1b.doubleValue(); // SELL
 
                                 path = 15;
 
+                            } else {
+                                triArbitrage = Double.valueOf(0);
                             }
 
                         }
@@ -1048,46 +1113,89 @@ public class MainActivity extends AppCompatActivity {
                                 (c1Base.equals(c2Base) && c2Quote.equals(c3Quote))
                                         && (c1Quote.equals(c3Base))) {
 
-//
                             if (cd1b.doubleValue() > (cd2a.doubleValue() * (1 / cd3b.doubleValue()))) {
 
                                 // Transitivity is bigger than the Implied Synthetic Cross-Rate
 
-                                triArbitrage[z] = maxBet * cd3b.doubleValue(); // SELL
-                                triArbitrage[z] = triArbitrage[z] / cd2a.doubleValue(); // BUY
-                                triArbitrage[z] = triArbitrage[z] * cd1b.doubleValue(); // SELL
+                                triArbitrage = maxBet * cd3b.doubleValue(); // SELL
+                                triArbitrage = triArbitrage / cd2a.doubleValue(); // BUY
+                                triArbitrage = triArbitrage * cd1b.doubleValue(); // SELL
 
                                 path = 11;
 
                             } else if (cd1a.doubleValue() < (cd2b.doubleValue() * (1 / cd3a.doubleValue()))) {
                                 // Transitivity is smaller than the Implied Synthetic Cross-Rate
 
-                                triArbitrage[z] = maxBet / cd1a.doubleValue(); // BUY
-                                triArbitrage[z] = triArbitrage[z] * cd2b.doubleValue(); // SELL
-                                triArbitrage[z] = triArbitrage[z] / cd3a.doubleValue(); // BUY
+                                triArbitrage = maxBet / cd1a.doubleValue(); // BUY
+                                triArbitrage = triArbitrage * cd2b.doubleValue(); // SELL
+                                triArbitrage = triArbitrage / cd3a.doubleValue(); // BUY
                                 path = 6;
 
+                            } else {
+                                triArbitrage = Double.valueOf(0);
                             }
 
                         }
 
 
-                        if (   // Path 7
+                        if (   // CHAIN 7
                                 (c1Base.equals(c2Quote) && c2Base.equals(c3Base))
                                         && (c1Quote.equals(c3Quote))) {
 
-                            triArbitrage[z] = (100 * ((cd1a.doubleValue()) * (cd2a.doubleValue()) * (1 / cd3b.doubleValue())) - 100);
-                            path = 2;
+
+                            if (cd1a.doubleValue() < (1 / cd2a.doubleValue()) * cd3b.doubleValue()) {
+                                // Transitivity is bigger than the Implied Synthetic Cross-Rate
+
+
+                                triArbitrage = maxBet / cd1a.doubleValue(); // BUY
+                                triArbitrage = triArbitrage / cd2a.doubleValue(); // BUY
+                                triArbitrage = triArbitrage * cd3b.doubleValue(); // SELL
+
+                                path = 7;
+
+                            } else if (cd1b.doubleValue() > (1 / cd2b.doubleValue()) * cd3a.doubleValue()) {
+                                // Transitivity is bigger than the Implied Synthetic Cross-Rate
+
+
+                                triArbitrage = maxBet / cd3a.doubleValue(); // BUY
+                                triArbitrage = triArbitrage * cd2b.doubleValue(); // SELL
+                                triArbitrage = triArbitrage * cd1b.doubleValue(); // SELL
+                                path = 13;
+
+                            } else {
+                                triArbitrage = Double.valueOf(0);
+                            }
 
                         }
 
 
-                        if (   // Path 8
+                        if (   // CHAIN 8
                                 (c1Base.equals(c2Quote) && c2Base.equals(c3Quote))
                                         && (c1Quote.equals(c3Base))) {
 
-                            triArbitrage[z] = (100 * ((cd1a.doubleValue()) * (cd2a.doubleValue()) * (cd3a.doubleValue())) - 100);
-                            path = 1;
+                            //	// ********* CHAIN 8
+
+
+                            if (cd1a.doubleValue() < (1 / cd2a.doubleValue()) * (1 / cd3a.doubleValue())) {
+                                // Transitivity is smaller than the Implied Synthetic Cross-Rate (CLOCKWISE)
+
+                                triArbitrage = maxBet / cd1a.doubleValue(); // BUY
+                                triArbitrage = triArbitrage / cd2a.doubleValue(); // BUY
+                                triArbitrage = triArbitrage / cd3a.doubleValue(); // BUY
+
+                                path = 8;
+
+                            } else if (cd1b.doubleValue() > (1 / cd2b.doubleValue()) * (1 / cd3b.doubleValue())) {
+                                // Transitivity is bigger than the Implied Synthetic Cross-Rate (COUNTER-CLOCKWISE)
+
+                                triArbitrage = maxBet * cd3b.doubleValue(); // SELL
+                                triArbitrage = triArbitrage * cd2b.doubleValue(); // SELL
+                                triArbitrage = triArbitrage * cd1b.doubleValue(); // SELL
+                                path = 9;
+
+                            } else {
+                                triArbitrage = Double.valueOf(0);
+                            }
 
                         }
 
@@ -1119,32 +1227,35 @@ public class MainActivity extends AppCompatActivity {
 
                         //***********************************************************
 
-                        if (triArbitrage[z] > 1 &&
-
-//                                exchange[chainIndex[a]].equals(exchange[chainIndex[b]])
-//                                && exchange[chainIndex[b]].equals(exchange[chainIndex[c]]))
-
-                                exchange[chainIndex[a]].equals("Poloniex") && exchange[chainIndex[b]].equals("Poloniex")
-                                && exchange[chainIndex[c]].equals("Poloniex")) {
-
-                            triArbitrage[z] = (double) Math.round(triArbitrage[z].doubleValue() * 1000d) / 1000d;
+                        if (
+                                triArbitrage > 101 && triArbitrage != 0
 
 
-                            strBuilder.append("[" + c1 + "]\t [" + c2 + "]\t [" + c3 + "]\n");
+//                                        ( exchange[chainIndex[a]].equals("Poloniex")
+//                                        && exchange[chainIndex[b]].equals("Poloniex") ||
+//                                        exchange[chainIndex[a]].equals("Kraken")
+//                                                && exchange[chainIndex[b]].equals("Kraken"))
+
+
+                        ) {
+
+
+                            triArbitrage -= 100;
+
+
                             strBuilder.append("[" + exchange[chainIndex[a]] + "] [" + exchange[chainIndex[b]] + "] [" + exchange[chainIndex[c]] + "]\n");
                             strBuilder.append(optimalPathText + "\n");
                             //  strBuilder.append("Trade 1: [" + pairTokens[chainIndex[a]] + "]\t Trade 2: [" + pairTokens[chainIndex[b]] + "]\t Trade 3: [" + pairTokens[chainIndex[c]] + "]\n");
-                            strBuilder.append("Bid: [" + bidTokens[chainIndex[a]] + "]\t Bid: [" + bidTokens[chainIndex[b]] + "]\t Bid: [" + bidTokens[chainIndex[c]] + "]\n");
                             strBuilder.append("Ask: [" + askTokens[chainIndex[a]] + "]\t Ask:[" + askTokens[chainIndex[b]] + "]\t Ask: [" + askTokens[chainIndex[c]] + "]\n");
-                            strBuilder.append("Arb Spread: [ " + triArbitrage[z].toString() + "% ] \t CHAIN:" + path + "\n\n");
+                            strBuilder.append("Bid: [" + bidTokens[chainIndex[a]] + "]\t Bid: [" + bidTokens[chainIndex[b]] + "]\t Bid: [" + bidTokens[chainIndex[c]] + "]\n");
+                            strBuilder.append("Arb Spread: [ " + triArbitrage.toString() + "% ] \t CHAIN:" + path + "\n\n");
 
 
-                            Log.d("ArbPROFIT", "[" + c1 + "] [" + c2 + "] [" + c3 + "]");
                             Log.d("ArbPROFIT", "[" + exchange[chainIndex[a]] + "] [" + exchange[chainIndex[b]] + "] [" + exchange[chainIndex[c]] + "]");
                             Log.d("ArbPROFIT", "C1: [" + pairTokens[chainIndex[a]] + "]\t C2: [" + pairTokens[chainIndex[b]] + "]\t C3: [" + pairTokens[chainIndex[c]] + "]");//                        Log.d("ArbChain", "C1: [" + pairTokens[chainIndex[a]] + "]\t C2: [" + pairTokens[chainIndex[b]] + "]\t C3: [" + pairTokens[chainIndex[c]]);
                             Log.d("ArbPROFIT", "C1: [" + askTokens[chainIndex[a]] + "]\t C2:[" + askTokens[chainIndex[b]] + "]\t C3: [" + askTokens[chainIndex[c]] + "]");
                             Log.d("ArbPROFIT", "C1: [" + bidTokens[chainIndex[a]] + "]\t C2: [" + bidTokens[chainIndex[b]] + "]\t C3: [" + bidTokens[chainIndex[c]] + "]");
-                            Log.d("ArbPROFIT", String.valueOf(triArbitrage[z]) + " \t PATH:" + path + "\n****");
+                            Log.d("ArbPROFIT", String.valueOf(triArbitrage) + " \t PATH:" + path + "\n****");
 
                         }
 
