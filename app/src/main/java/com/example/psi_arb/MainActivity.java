@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -36,6 +35,7 @@ import java.util.Set;
 
 import static android.widget.Toast.LENGTH_LONG;
 import static com.example.psi_arb.NormalizePairs.normalize;
+import static com.example.psi_arb.NormalizePairs.normalizeHitBTC;
 
 //*******************************************************************************************
 //
@@ -145,9 +145,16 @@ public class MainActivity extends AppCompatActivity {
     private static BigDecimal[] poloniexAsk = new BigDecimal[1000];
 
     static String[] bitMartPair = new String[1000];
-    private static BigDecimal[] bitMartBid = new BigDecimal[1000];
-    private static BigDecimal[] bitMartAsk = new BigDecimal[1000];
+    private static BigDecimal[] bitmartAsk = new BigDecimal[1000];
+    private static BigDecimal[] bitmartBid = new BigDecimal[1000];
 
+    static String[] hitBTCPair = new String[1000];
+    private static BigDecimal[] hitBTCBid = new BigDecimal[1000];
+    private static BigDecimal[] hitBTCAsk = new BigDecimal[1000];
+
+    static String[] bitZPair = new String[1000];
+    private static BigDecimal[] bitZAsk = new BigDecimal[1000];
+    private static BigDecimal[] bitZBid = new BigDecimal[1000];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,7 +166,9 @@ public class MainActivity extends AppCompatActivity {
         exRate.setMovementMethod(new ScrollingMovementMethod());
         exRate.setText("Loading Data Please Wait");
         Toast.makeText(getApplicationContext(), "Loading Data Please Wait", LENGTH_LONG).show();
+
         getCryptoPair();
+        //   new LongOperation().execute();
 
     }
 
@@ -203,10 +212,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    // *********************************************
+    // ****************************************************
     //  REST api public end points to parse exchange rates
     //  in JSON format
-    //**********************************************
+    //*****************************************************
 
     //https://api.hitbtc.com/api/2/public/ticker
     //https://apiv2.bitz.com/Market/tickerall
@@ -215,6 +224,8 @@ public class MainActivity extends AppCompatActivity {
     //https://api.bithumb.com/public/ticker/ALL
     //https://openapi-v2.kucoin.com/api/v1/market/allTickers
     //https://api.gemini.com/v1/pubticker/btcusd
+
+
     private void getCryptoPair() {
 
         RequestQueue queue = Volley.newRequestQueue(this);
@@ -606,24 +617,33 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     JSONObject bitmart;
 
+                    bitMartPair = new String[response.length()];
+                    bitmartAsk = new BigDecimal[response.length()];
+                    bitmartBid = new BigDecimal[response.length()];
 
-                    for(int i =0; i < response.length(); i++) {
+                    for (int i = 0; i < response.length(); i++) {
+
 
                         bitmart = (JSONObject) response.get(i);
+
                         String pair = (String) bitmart.get("symbol_id");
                         String bid = (String) bitmart.get("bid_1");
                         String ask = (String) bitmart.get("ask_1");
 
-                        System.out.println("BITMART" + pair +  bitmart.toString());
-                    }
 
+                        if (pair != null) {
+                            bitMartPair[i] = pair;
+                            bitmartBid[i] = BigDecimal.valueOf(Double.parseDouble(bid));
+                            bitmartAsk[i] = BigDecimal.valueOf(Double.parseDouble(ask));
+                            System.out.println("bitmart" + pair + " " + bid + " " + ask + "\t" + bitMartPair.length);
+                        }
+
+
+                    }
 
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-
-
 
             }
         }, new Response.ErrorListener() {
@@ -634,6 +654,157 @@ public class MainActivity extends AppCompatActivity {
         });
 
         queue.add(bitMart);
+
+        URL = "https://api.hitbtc.com/api/2/public/ticker";
+
+        final JsonArrayRequest hitBTC = new JsonArrayRequest(Request.Method.GET, URL, null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+
+
+                String pair;
+                BigDecimal bid;
+                BigDecimal ask;
+
+                try {
+
+                    for (int i = 0; i < 200; i++) {
+
+                        JSONObject hitBTCobj = (JSONObject) response.get(i);
+
+                        pair = (String) hitBTCobj.get("symbol");
+                        ask = BigDecimal.valueOf(Double.parseDouble(String.valueOf(hitBTCobj.get("ask"))));
+                        bid = BigDecimal.valueOf(Double.parseDouble(String.valueOf(hitBTCobj.get("bid"))));
+
+                        if (pair != null) {
+                            hitBTCPair[i] = pair;
+                            hitBTCBid[i] = bid;
+                            hitBTCAsk[i] = ask;
+                        }
+
+                        String base = hitBTCPair[i].substring(0, 3);
+                        String quote = hitBTCPair[i].substring(3, hitBTCPair[i].length());
+
+                        normalizeHitBTC(hitBTCPair[i], i);
+
+                        if (hitBTCPair[i].substring(hitBTCPair[i].length() - 3, hitBTCPair[i].length()).equals("BTC")
+                                || hitBTCPair[i].substring(hitBTCPair[i].length() - 3, hitBTCPair[i].length()).equals("ETH")
+                                || hitBTCPair[i].substring(hitBTCPair[i].length() - 3, hitBTCPair[i].length()).equals("USD")
+                                || hitBTCPair[i].substring(hitBTCPair[i].length() - 3, hitBTCPair[i].length()).equals("BCH")
+                                || hitBTCPair[i].substring(hitBTCPair[i].length() - 3, hitBTCPair[i].length()).equals("USDT")
+
+                        ) {
+                            base = hitBTCPair[i].substring(0, hitBTCPair[i].length() - 3);
+                            hitBTCPair[i] = base + "_" + quote;
+                        }
+
+
+                        if (!hitBTCPair[i].contains("_") || hitBTCPair[i].contains(("__"))) {
+                            hitBTCPair[i] = "EMPTY";
+                        }
+
+
+                        System.out.println("HITBTC" + " " + hitBTCPair[i] + " " + hitBTCAsk[i] + " " + hitBTCBid[i]);
+
+                    }
+
+                    if (hitBTCPair[0] != null) {
+                        List<String> list = new ArrayList<String>();
+
+                        for (String s : hitBTCPair) {
+                            if (s != null && s.length() > 0) {
+                                list.add(s);
+
+                            }
+                        }
+
+                        hitBTCPair = list.toArray(new String[list.size()]);
+                    }
+
+                    if (hitBTCAsk[0] != null) {
+                        List<BigDecimal> list = new ArrayList<>();
+
+                        for (BigDecimal b : hitBTCAsk) {
+                            if (b != null) {
+                                list.add(b);
+
+                            }
+                        }
+
+                        hitBTCAsk = list.toArray(new BigDecimal[list.size()]);
+
+                    }
+
+                    if (hitBTCBid[0] != null) {
+                        List<BigDecimal> list = new ArrayList<>();
+
+                        for (BigDecimal b : hitBTCBid) {
+                            if (b != null) {
+                                list.add(b);
+
+                            }
+                        }
+
+                        hitBTCBid = list.toArray(new BigDecimal[list.size()]);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+        queue.add(hitBTC);
+
+        URL = "https://apiv2.bitz.com/Market/tickerall";
+
+        JsonObjectRequest bitZ = new JsonObjectRequest(Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+
+                try {
+                    JSONObject obj = (JSONObject) response.get("data");
+
+                    JSONObject bidObj = (JSONObject) obj.get("bidPrice");
+                    Iterator keys = obj.keys();
+                    String pair;
+
+                    int i = 0;
+                    while (keys.hasNext()) {
+
+
+
+                        pair = (String) keys.next();
+                        pair.toUpperCase();
+
+                        Log.d("BITZset", " " + bidObj.toString() + " " + (String) keys.next() + " " + i);
+                        i++;
+
+                    }
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+        queue.add(bitZ);
 
         //******************************************************************** JSON Parsing Complete
         //
@@ -649,6 +820,8 @@ public class MainActivity extends AppCompatActivity {
         pairTokens = concatenate(pairTokens, okexPair);
         pairTokens = concatenate(pairTokens, krakenPair);
         pairTokens = concatenate(pairTokens, poloniexPair);
+        pairTokens = concatenate(pairTokens, bitMartPair);
+        pairTokens = concatenate(pairTokens, hitBTCPair);
 
         bidTokens = concatenate(bidTokens, bitfinexxBid);
         bidTokens = concatenate(bidTokens, bittrexBid);
@@ -656,6 +829,9 @@ public class MainActivity extends AppCompatActivity {
         bidTokens = concatenate(bidTokens, okexBid);
         bidTokens = concatenate(bidTokens, krakenBid);
         bidTokens = concatenate(bidTokens, poloniexBid);
+        bidTokens = concatenate(bidTokens, bitmartBid);
+        bidTokens = concatenate(bidTokens, hitBTCBid);
+
 
         askTokens = concatenate(askTokens, bitfinexAsk);
         askTokens = concatenate(askTokens, bittrexAsk);
@@ -663,6 +839,8 @@ public class MainActivity extends AppCompatActivity {
         askTokens = concatenate(askTokens, okexAsk);
         askTokens = concatenate(askTokens, krakenAsk);
         askTokens = concatenate(askTokens, poloniexAsk);
+        askTokens = concatenate(askTokens, bitmartAsk);
+        askTokens = concatenate(askTokens, hitBTCAsk);
 
 
 //*****************************************************************
@@ -672,7 +850,7 @@ public class MainActivity extends AppCompatActivity {
                 && (!Arrays.asList(askTokens).subList(0, askTokens.length).contains(null))
                 && (!Arrays.asList(bidTokens).subList(0, bidTokens.length).contains(null))
                 && (bitfinexPair.length < 1000 && bittrexPair.length < 1000 && binancePair.length < 1000 && okexPair.length < 1000
-                && krakenPair.length < 1000 && poloniexPair.length < 1000)) {
+                && krakenPair.length < 1000 && poloniexPair.length < 1000 && bitMartPair.length < 1000 && hitBTCPair.length < 1000 && bitZPair.length < 1000)) {
 
 
             timer = 50000;
@@ -706,6 +884,15 @@ public class MainActivity extends AppCompatActivity {
             for (int i = market4; i < market5; i++) {
                 exchange[i] = "Poloniex";
             }
+            int market6 = bitfinexPair.length + bittrexPair.length + binancePair.length + okexPair.length + krakenPair.length + poloniexPair.length + bitMartPair.length;
+            for (int i = market5; i < market6; i++) {
+                exchange[i] = "Bitmart";
+            }
+            int market7 = bitfinexPair.length + bittrexPair.length + binancePair.length + okexPair.length + krakenPair.length + poloniexPair.length + bitMartPair.length + hitBTCPair.length;
+            for (int i = market6; i < market7; i++) {
+                exchange[i] = "HitBTC";
+            }
+            //
 
 
             //************************************************************  [BASE]-[QUOTE]  TOKENS
@@ -779,14 +966,18 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case "TRX":
                 return true;
-            case "JPY":
+//            case "JPY":
+//                return true;
+            case "GAS":
+                return true;
+            case "STOREJ":
                 return true;
             case "EUR":
                 return true;
             case "GBP":
                 return true;
-            case "ETC":
-                return true;
+//            case "ETC":
+//                return true;
             case "DASH":
                 return true;
             case "ZEC":

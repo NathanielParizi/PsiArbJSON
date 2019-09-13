@@ -9,6 +9,7 @@ package com.example.psi_arb;
 // operations.
 //*****************************************************************
 
+import static com.example.psi_arb.MainActivity.hitBTCPair;
 import static com.example.psi_arb.MainActivity.poloniexPair;
 
 public class NormalizePairs {
@@ -900,12 +901,870 @@ public class NormalizePairs {
 
     }
 
-    public static void normalizePoloniex(String str, int i){
+    public static void normalizeHitBTC(String str, int i) {
 
-        if(str.equals("BTC_EOS")){
+        switch (str) {
+
+            case "QTUMETH":
+                hitBTCPair[i] = "QTUM_ETH";
+                break;
+            case "BTCUSDT":
+                hitBTCPair[i] = "BTC_USDT";
+                break;
+            case "ETHUSDT":
+                hitBTCPair[i] = "ETH_USDT";
+                break;
+            case "QTUMBTC":
+                hitBTCPair[i] = "QTUM_BTC";
+                break;
+            case "YOYOBTC":
+                hitBTCPair[i] = "YOYO_BTC";
+                break;
+            case "STRATBTC":
+                hitBTCPair[i] = "STRAT_BTC";
+                break;
+            case "STRATETH":
+                hitBTCPair[i] = "STRAT_ETH";
+                break;
+            case "SNGLSBTC":
+                hitBTCPair[i] = "SNGLS_BTC";
+                break;
+            case "SNGLSETH":
+                hitBTCPair[i] = "SNGLS_ETH";
+                break;
+            case "IOTABTC":
+                hitBTCPair[i] = "IOTA_BTC";
+                break;
+            case "IOTAETH":
+                hitBTCPair[i] = "IOTA_ETH";
+                break;
+            case "LINKBTC":
+                hitBTCPair[i] = "LINK_BTC";
+                break;
+            case "LINKETH":
+                hitBTCPair[i] = "LINK_ETH";
+                break;
+            case "SALTBTC":
+                hitBTCPair[i] = "SALT_BTC";
+                break;
+            case "SALTETH":
+                hitBTCPair[i] = "SALT_ETH";
+                break;
+            case "DASHBTC":
+                hitBTCPair[i] = "DASH_BTC";
+                break;
+            case "DASHETH":
+                hitBTCPair[i] = "DASH_ETH";
+                break;
+            case "POWRBTC":
+                hitBTCPair[i] = "POWR_BTC";
+                break;
+            case "POWRETH":
+                hitBTCPair[i] = "POWR_ETH";
+                break;
+            case "YOYOETH":
+                hitBTCPair[i] = "YOYO_ETH";
+                break;
+            case "STORJBTC":
+                hitBTCPair[i] = "STORJ_BTC";
+                break;
+            case "STORJETH":
+                hitBTCPair[i] = "STORJ_ETH";
+                break;
+            case "BNBUSDT":
+                hitBTCPair[i] = "BNB_USDT";
+                break;
+            case "YOYOBNB":
+                hitBTCPair[i] = "YOYO_BNB";
+                break;
+            case "POWRBNB":
+                hitBTCPair[i] = "POWR_BNB";
+                break;
+            case "NULSBNB":
+                hitBTCPair[i] = "NULS_BNB";
+                break;
+            case "NULSBTC":
+                hitBTCPair[i] = "NULS_BTC";
+                break;
+            case "NULSETH":
+                hitBTCPair[i] = "NULS_ETH";
+                break;
+            case "BCCUSDT":
+                hitBTCPair[i] = "BCC_USDT";
+                break;
+            case "BCPTBTC":
+                hitBTCPair[i] = "BCPT_BTC";
+                break;
+            case "BCPTETH":
+                hitBTCPair[i] = "BCPT_ETH";
+                break;
+            case "BCPTBNB":
+                hitBTCPair[i] = "BCPT_BNB";
+                break;
+            case "NEOUSDT":
+                hitBTCPair[i] = "NEO_USDT";
+                break;
+            case "FUELBTC":
+                hitBTCPair[i] = "FUEL_BTC";
+                break;
+            case "FUELETH":
+                hitBTCPair[i] = "FUEL_ETH";
+                break;
+            case "MANABTC":
+                hitBTCPair[i] = "MANA_BTC";
+                break;
+            case "MANAETH":
+                hitBTCPair[i] = "MANA_ETH";
+                break;
+            case "IOTABNB":
+                hitBTCPair[i] = "IOTA_BNB";
+                break;
+            case "LENDBTC":
+                hitBTCPair[i] = "LEND_BTC";
+                break;
+            case "LENDETH":
+                hitBTCPair[i] = "LEND_ETH";
+                break;
+            case "WABIBTC":
+                hitBTCPair[i] = "WABI_BTC";
+                break;
+            case "WABIETH":
+                hitBTCPair[i] = "WABI_ETH";
+                break;
+            case "WABIBNB":
+                hitBTCPair[i] = "WABI_BNB";
+                break;
+            case "LTCUSDT":
+                hitBTCPair[i] = "LTCU_SDT";
+                break;
+            case "WAVESBTC":
+                hitBTCPair[i] = "WAVES_BTC";
+                break;
+            case "WAVESETH":
+                hitBTCPair[i] = "WAVES_ETH";
+                break;
+            case "WAVESBNB":
+                hitBTCPair[i] = "WAVES_BNB";
+                break;
+            case "AIONBTC":
+                hitBTCPair[i] = "AION_BTC";
+                break;
+            case "AIONETH":
+                hitBTCPair[i] = "AION_ETH";
+                break;
+            case "AIONBNB":
+                hitBTCPair[i] = "AION_BNB";
+                break;
+            case "NEBLBTC":
+                hitBTCPair[i] = "NEBL_BTC";
+                break;
+            case "NEBLETH":
+                hitBTCPair[i] = "NEBL_ETH";
+                break;
+            case "NEBLBNB":
+                hitBTCPair[i] = "NEBL_BNB";
+                break;
+            case "WINGSBTC":
+                hitBTCPair[i] = "WINGS_BTC";
+                break;
+            case "WINGSETH":
+                hitBTCPair[i] = "WINGS_ETH";
+                break;
+            case "APPCBTC":
+                hitBTCPair[i] = "APPC_BTC";
+                break;
+            case "APPCETH":
+                hitBTCPair[i] = "APPC_ETH";
+                break;
+            case "APPCBNB":
+                hitBTCPair[i] = "APPC_BNB";
+                break;
+            case "VIBEBTC":
+                hitBTCPair[i] = "VIBE_BTC";
+                break;
+            case "VIBEETH":
+                hitBTCPair[i] = "VIBE_ETH";
+                break;
+            case "PIVXBTC":
+                hitBTCPair[i] = "PIVX_BTC";
+                break;
+            case "PIVXETH":
+                hitBTCPair[i] = "PIVX_ETH";
+                break;
+            case "PIVXBNB":
+                hitBTCPair[i] = "PIVX_BNB";
+                break;
+            case "IOSTBTC":
+                hitBTCPair[i] = "IOST_BTC";
+                break;
+            case "IOSTETH":
+                hitBTCPair[i] = "IOST_ETH";
+                break;
+            case "STEEMBTC":
+                hitBTCPair[i] = "STEEM_BTC";
+                break;
+            case "STEEMETH":
+                hitBTCPair[i] = "STEEM_ETH";
+                break;
+            case "STEEMBNB":
+                hitBTCPair[i] = "STEEM_BNB";
+                break;
+            case "NANOBTC":
+                hitBTCPair[i] = "NANO_BTC";
+                break;
+            case "NANOETH":
+                hitBTCPair[i] = "NANO_ETH";
+                break;
+            case "NANOBNB":
+                hitBTCPair[i] = "NANO_BNB";
+                break;
+            case "AEBTC":
+                hitBTCPair[i] = "AE_BTC";
+                break;
+            case "AEETH":
+                hitBTCPair[i] = "AE_ETH";
+                break;
+            case "AEBNB":
+                hitBTCPair[i] = "AE_BNB";
+                break;
+            case "NCASHBTC":
+                hitBTCPair[i] = "NCASH_BTC";
+                break;
+            case "NCASHETH":
+                hitBTCPair[i] = "NCASH_ETH";
+                break;
+            case "NCASHBNB":
+                hitBTCPair[i] = "NCASH_BNB";
+                break;
+            case "STORMBTC":
+                hitBTCPair[i] = "STORM_BTC";
+                break;
+            case "STORMETH":
+                hitBTCPair[i] = "STORM_ETH";
+                break;
+            case "STORMBNB":
+                hitBTCPair[i] = "STORM_BNB";
+                break;
+            case "QTUMUSDT":
+                hitBTCPair[i] = "QTUM_USDT";
+                break;
+            case "QTUMBNB":
+                hitBTCPair[i] = "QTUM_BNB";
+                break;
+            case "ADAUSDT":
+                hitBTCPair[i] = "ADA_USDT";
+                break;
+            case "LOOMBTC":
+                hitBTCPair[i] = "LOOM_BTC";
+                break;
+            case "LOOMETH":
+                hitBTCPair[i] = "LOOM_ETH";
+                break;
+            case "LOOMBNB":
+                hitBTCPair[i] = "LOOM_BNB";
+                break;
+            case "XRPUSDT":
+                hitBTCPair[i] = "XRP_USDT";
+                break;
+            case "BTCTUSD":
+                hitBTCPair[i] = "BTC_TUSD";
+                break;
+            case "ETHTUSD":
+                hitBTCPair[i] = "ETH_TUSD";
+                break;
+            case "EOSUSDT":
+                hitBTCPair[i] = "EOS_USDT";
+                break;
+            case "THETABTC":
+                hitBTCPair[i] = "THETA_BTC";
+                break;
+            case "THETAETH":
+                hitBTCPair[i] = "THETA_ETH";
+                break;
+            case "THETABNB":
+                hitBTCPair[i] = "THETA_BNB";
+                break;
+            case "TUSDUSDT":
+                hitBTCPair[i] = "TUSD_USDT";
+                break;
+            case "IOTAUSDT":
+                hitBTCPair[i] = "IOTA_USDT";
+                break;
+            case "XLMUSDT":
+                hitBTCPair[i] = "XLM_USDT";
+                break;
+            case "IOTXBTC":
+                hitBTCPair[i] = "IOTX_BTC";
+                break;
+            case "IOTXETH":
+                hitBTCPair[i] = "IOTX_ETH";
+                break;
+            case "DATABTC":
+                hitBTCPair[i] = "DATA_BTC";
+                break;
+            case "DATAETH":
+                hitBTCPair[i] = "DATA_ETH";
+                break;
+            case "ONTUSDT":
+                hitBTCPair[i] = "ON_TUSDT";
+                break;
+            case "TRXUSDT":
+                hitBTCPair[i] = "TRX_USDT";
+                break;
+            case "ETCUSDT":
+                hitBTCPair[i] = "ETC_USDT";
+                break;
+            case "ICXUSDT":
+                hitBTCPair[i] = "ICX_USDT";
+                break;
+            case "NPXSBTC":
+                hitBTCPair[i] = "NPXS_BTC";
+                break;
+            case "NPXSETH":
+                hitBTCPair[i] = "NPXS_ETH";
+                break;
+            case "VENUSDT":
+                hitBTCPair[i] = "VEN_USDT";
+                break;
+            case "DENTBTC":
+                hitBTCPair[i] = "DENT_BTC";
+                break;
+            case "DENTETH":
+                hitBTCPair[i] = "DENT_ETH";
+                break;
+            case "ARDRBTC":
+                hitBTCPair[i] = "ARDR_BTC";
+                break;
+            case "ARDRETH":
+                hitBTCPair[i] = "ARDR_ETH";
+                break;
+            case "ARDRBNB":
+                hitBTCPair[i] = "ARDR_BNB";
+                break;
+            case "NULSUSDT":
+                hitBTCPair[i] = "NULSU_SDT";
+                break;
+            case "VETUSDT":
+                hitBTCPair[i] = "VET_USDT";
+                break;
+            case "DOCKBTC":
+                hitBTCPair[i] = "DOCK_BTC";
+                break;
+            case "DOCKETH":
+                hitBTCPair[i] = "DOCK_ETH";
+                break;
+            case "POLYBTC":
+                hitBTCPair[i] = "POLY_BTC";
+                break;
+            case "POLYBNB":
+                hitBTCPair[i] = "POLY_BNB";
+                break;
+            case "HCBTC":
+                hitBTCPair[i] = "HC_BTC";
+                break;
+            case "HCETH":
+                hitBTCPair[i] = "HC_ETH";
+                break;
+            case "GOBTC":
+                hitBTCPair[i] = "GO_BTC";
+                break;
+            case "GOBNB":
+                hitBTCPair[i] = "GO_BNB";
+                break;
+            case "PAXUSDT":
+                hitBTCPair[i] = "PAX_USDT";
+                break;
+            case "MITHBTC":
+                hitBTCPair[i] = "MITH_BTC";
+                break;
+            case "MITHBNB":
+                hitBTCPair[i] = "MITH_BNB";
+                break;
+            case "BCHABCBTC":
+                hitBTCPair[i] = "BCHABC_BTC";
+                break;
+            case "BCHSVUSDT":
+                hitBTCPair[i] = "BCHSV_USDT";
+                break;
+            case "BCHABCUSDT":
+                hitBTCPair[i] = "BCHABC_USDT";
+                break;
+            case "BNBTUSD":
+                hitBTCPair[i] = "BNB_TUSD";
+                break;
+            case "XRPTUSD":
+                hitBTCPair[i] = "XRP_TUSD";
+                break;
+            case "EOSTUSD":
+                hitBTCPair[i] = "EOS_TUSD";
+                break;
+            case "XLMTUSD":
+                hitBTCPair[i] = "XLM_TUSD";
+                break;
+            case "BNBUSDC":
+                hitBTCPair[i] = "BNB_USDC";
+                break;
+            case "BTCUSDC":
+                hitBTCPair[i] = "BTC_USDC";
+                break;
+            case "ETHUSDC":
+                hitBTCPair[i] = "ETH_USDC";
+                break;
+            case "XRPUSDC":
+                hitBTCPair[i] = "XRP_USDC";
+                break;
+            case "EOSUSDC":
+                hitBTCPair[i] = "EOS_USDC";
+                break;
+            case "XLMUSDC":
+                hitBTCPair[i] = "XLM_USDC";
+                break;
+            case "USDCUSDT":
+                hitBTCPair[i] = "USD_CUSDT";
+                break;
+            case "ADATUSD":
+                hitBTCPair[i] = "ADA_TUSD";
+                break;
+            case "TRXTUSD":
+                hitBTCPair[i] = "TRX_TUSD";
+                break;
+            case "NEOTUSD":
+                hitBTCPair[i] = "NEO_TUSD";
+                break;
+            case "PAXTUSD":
+                hitBTCPair[i] = "PAX_TUSD";
+                break;
+            case "USDCTUSD":
+                hitBTCPair[i] = "USDC_TUSD";
+                break;
+            case "USDCPAX":
+                hitBTCPair[i] = "USD_CPAX";
+                break;
+            case "LINKUSDT":
+                hitBTCPair[i] = "LINK_USDT";
+                break;
+            case "LINKTUSD":
+                hitBTCPair[i] = "LINK_TUSD";
+                break;
+            case "LINKPAX":
+                hitBTCPair[i] = "LINK_PAX";
+                break;
+            case "LINKUSDC":
+                hitBTCPair[i] = "LINK_USDC";
+                break;
+            case "WAVESUSDT":
+                hitBTCPair[i] = "WAVES_USDT";
+                break;
+            case "WAVESTUSD":
+                hitBTCPair[i] = "WAVES_TUSD";
+                break;
+            case "WAVESPAX":
+                hitBTCPair[i] = "WAVES_PAX";
+                break;
+            case "WAVESUSDC":
+                hitBTCPair[i] = "WAVES_USDC";
+                break;
+            case "BCHABCTUSD":
+                hitBTCPair[i] = "BCHABC_TUSD";
+                break;
+            case "BCHABCPAX":
+                hitBTCPair[i] = "BCHABC_PAX";
+                break;
+            case "BCHABCUSDC":
+                hitBTCPair[i] = "BCHABC_USDC";
+                break;
+            case "LTCTUSD":
+                hitBTCPair[i] = "LTC_TUSD";
+                break;
+            case "LTCUSDC":
+                hitBTCPair[i] = "LTC_USDC";
+                break;
+            case "TRXUSDC":
+                hitBTCPair[i] = "TRX_USDC";
+                break;
+            case "BTTUSDT":
+                hitBTCPair[i] = "BTT_USDT";
+                break;
+            case "BNBUSDS":
+                hitBTCPair[i] = "BNB_USDS";
+                break;
+            case "BTCUSDS":
+                hitBTCPair[i] = "BTC_USDS";
+                break;
+            case "USDSUSDT":
+                hitBTCPair[i] = "USDS_USDT";
+                break;
+            case "USDSPAX":
+                hitBTCPair[i] = "USDS_PAX";
+                break;
+            case "USDSTUSD":
+                hitBTCPair[i] = "USDS_TUSD";
+                break;
+            case "USDSUSDC":
+                hitBTCPair[i] = "USDS_USDC";
+                break;
+            case "BTTTUSD":
+                hitBTCPair[i] = "BTT_TUSD";
+                break;
+            case "BTTUSDC":
+                hitBTCPair[i] = "BTT_USDC";
+                break;
+            case "ONGUSDT":
+                hitBTCPair[i] = "ONG_USDT";
+                break;
+            case "HOTUSDT":
+                hitBTCPair[i] = "HOT_USDT";
+                break;
+            case "ZILUSDT":
+                hitBTCPair[i] = "ZIL_USDT";
+                break;
+            case "ZRXUSDT":
+                hitBTCPair[i] = "ZRX_USDT";
+                break;
+            case "FETUSDT":
+                hitBTCPair[i] = "FET_USDT";
+                break;
+            case "BATUSDT":
+                hitBTCPair[i] = "BAT_USDT";
+                break;
+            case "XMRUSDT":
+                hitBTCPair[i] = "XMR_USDT";
+                break;
+            case "ZECUSDT":
+                hitBTCPair[i] = "ZEC_USDT";
+                break;
+            case "ZECTUSD":
+                hitBTCPair[i] = "ZEC_TUSD";
+                break;
+            case "ZECUSDC":
+                hitBTCPair[i] = "ZEC_USDC";
+                break;
+            case "IOSTBNB":
+                hitBTCPair[i] = "IOST_BNB";
+                break;
+            case "IOSTUSDT":
+                hitBTCPair[i] = "IOST_USDT";
+                break;
+            case "CELRBNB":
+                hitBTCPair[i] = "CELR_BNB";
+                break;
+            case "CELRBTC":
+                hitBTCPair[i] = "CELR_BTC";
+                break;
+            case "CELRUSDT":
+                hitBTCPair[i] = "CELR_USDT";
+                break;
+            case "ADAUSDC":
+                hitBTCPair[i] = "ADA_USDC";
+                break;
+            case "NEOPAX":
+                hitBTCPair[i] = "NEO_PAX";
+                break;
+            case "NEOUSDC":
+                hitBTCPair[i] = "NEO_USDC";
+                break;
+            case "DASHBNB":
+                hitBTCPair[i] = "DASH_BNB";
+                break;
+            case "DASHUSDT":
+                hitBTCPair[i] = "DASH_USDT";
+                break;
+            case "NANOUSDT":
+                hitBTCPair[i] = "NANO_USDT";
+                break;
+            case "OMGUSDT":
+                hitBTCPair[i] = "OMG_USDT";
+                break;
+            case "THETAUSDT":
+                hitBTCPair[i] = "THETA_USDT";
+                break;
+            case "ENJUSDT":
+                hitBTCPair[i] = "ENJ_USDT";
+                break;
+            case "MITHUSDT":
+                hitBTCPair[i] = "MITH_USDT";
+                break;
+            case "MATICBNB":
+                hitBTCPair[i] = "MATIC_BNB";
+                break;
+            case "MATICBTC":
+                hitBTCPair[i] = "MATIC_BTC";
+                break;
+            case "MATICUSDT":
+                hitBTCPair[i] = "MATIC_USDT";
+                break;
+            case "ATOMBNB":
+                hitBTCPair[i] = "ATOM_BNB";
+                break;
+            case "ATOMBTC":
+                hitBTCPair[i] = "ATOM_BTC";
+                break;
+            case "ATOMUSDT":
+                hitBTCPair[i] = "ATOM_USDT";
+                break;
+            case "ATOMUSDC":
+                hitBTCPair[i] = "ATOM_USDC";
+                break;
+            case "ATOMPAX":
+                hitBTCPair[i] = "ATOM_PAX";
+                break;
+            case "ATOMTUSD":
+                hitBTCPair[i] = "ATOM_TUSD";
+                break;
+            case "ETCUSDC":
+                hitBTCPair[i] = "ETC_USDC";
+                break;
+            case "ETCTUSD":
+                hitBTCPair[i] = "ETC_TUSD";
+                break;
+            case "BATUSDC":
+                hitBTCPair[i] = "BAT_USDC";
+                break;
+            case "BATTUSD":
+                hitBTCPair[i] = "BAT_TUSD";
+                break;
+            case "PHBUSDC":
+                hitBTCPair[i] = "PHB_USDC";
+                break;
+            case "PHBTUSD":
+                hitBTCPair[i] = "PHB_TUSD";
+                break;
+            case "TFUELBNB":
+                hitBTCPair[i] = "TFUEL_BNB";
+                break;
+            case "TFUELBTC":
+                hitBTCPair[i] = "TFUEL_BTC";
+                break;
+            case "TFUELUSDT":
+                hitBTCPair[i] = "TFUEL_USDT";
+                break;
+            case "TFUELUSDC":
+                hitBTCPair[i] = "TFUEL_USDC";
+                break;
+            case "TFUELTUSD":
+                hitBTCPair[i] = "TFUEL_TUSD";
+                break;
+            case "TFUELPAX":
+                hitBTCPair[i] = "TFUEL_PAX";
+                break;
+            case "ONEUSDT":
+                hitBTCPair[i] = "ONE_USDT";
+                break;
+            case "ONETUSD":
+                hitBTCPair[i] = "ONET_USD";
+                break;
+            case "ONEUSDC":
+                hitBTCPair[i] = "ONE_USDC";
+                break;
+            case "FTMUSDT":
+                hitBTCPair[i] = "FTM_USDT";
+                break;
+            case "FTMTUSD":
+                hitBTCPair[i] = "FTM_TUSD";
+                break;
+            case "FTMUSDC":
+                hitBTCPair[i] = "FTM_USDC";
+                break;
+            case "BTCBBTC":
+                hitBTCPair[i] = "BTCB_BTC";
+                break;
+            case "BCPTTUSD":
+                hitBTCPair[i] = "BCPT_TUSD";
+                break;
+            case "BCPTPAX":
+                hitBTCPair[i] = "BCPT_PAX";
+                break;
+            case "BCPTUSDC":
+                hitBTCPair[i] = "BCPT_USDC";
+                break;
+            case "ALGOBNB":
+                hitBTCPair[i] = "ALGO_BNB";
+                break;
+            case "ALGOBTC":
+                hitBTCPair[i] = "ALGO_BTC";
+                break;
+            case "ALGOUSDT":
+                hitBTCPair[i] = "ALGO_USDT";
+                break;
+            case "ALGOTUSD":
+                hitBTCPair[i] = "ALGO_TUSD";
+                break;
+            case "ALGOPAX":
+                hitBTCPair[i] = "ALGO_PAX";
+                break;
+            case "ALGOUSDC":
+                hitBTCPair[i] = "ALGO_USDC";
+                break;
+            case "USDSBUSDT":
+                hitBTCPair[i] = "USDSB_USDT";
+                break;
+            case "USDSBUSDS":
+                hitBTCPair[i] = "USDSB_USDS";
+                break;
+            case "GTOUSDT":
+                hitBTCPair[i] = "GTO_USDT";
+                break;
+            case "GTOTUSD":
+                hitBTCPair[i] = "GTOT_USD";
+                break;
+            case "GTOUSDC":
+                hitBTCPair[i] = "GTO_USDC";
+                break;
+            case "ERDUSDT":
+                hitBTCPair[i] = "ERD_USDT";
+                break;
+            case "ERDUSDC":
+                hitBTCPair[i] = "ERD_USDC";
+                break;
+            case "DOGEBNB":
+                hitBTCPair[i] = "DOGE_BNB";
+                break;
+            case "DOGEBTC":
+                hitBTCPair[i] = "DOGE_BTC";
+                break;
+            case "DOGEUSDT":
+                hitBTCPair[i] = "DOGE_USDT";
+                break;
+            case "DOGEPAX":
+                hitBTCPair[i] = "DOGE_PAX";
+                break;
+            case "DOGEUSDC":
+                hitBTCPair[i] = "DOGE_USDC";
+                break;
+            case "DUSKBNB":
+                hitBTCPair[i] = "DUSK_BNB";
+                break;
+            case "DUSKBTC":
+                hitBTCPair[i] = "DUSK_BTC";
+                break;
+            case "DUSKUSDT":
+                hitBTCPair[i] = "DUSK_USDT";
+                break;
+            case "DUSKUSDC":
+                hitBTCPair[i] = "DUSK_USDC";
+                break;
+            case "DUSKPAX":
+                hitBTCPair[i] = "DUSK_PAX";
+                break;
+            case "BGBPUSDC":
+                hitBTCPair[i] = "BGBP_USDC";
+                break;
+            case "ANKRBNB":
+                hitBTCPair[i] = "ANKR_BNB";
+                break;
+            case "ANKRBTC":
+                hitBTCPair[i] = "ANKR_BTC";
+                break;
+            case "ANKRUSDT":
+                hitBTCPair[i] = "ANKR_USDT";
+                break;
+            case "ANKRTUSD":
+                hitBTCPair[i] = "ANKR_TUSD";
+                break;
+            case "ANKRPAX":
+                hitBTCPair[i] = "ANKR_PAX";
+                break;
+            case "ANKRUSDC":
+                hitBTCPair[i] = "ANKR_USDC";
+                break;
+            case "ONTUSDC":
+                hitBTCPair[i] = "ONT_USDC";
+                break;
+            case "WINUSDT":
+                hitBTCPair[i] = "WIN_USDT";
+                break;
+            case "WINUSDC":
+                hitBTCPair[i] = "WIN_USDC";
+                break;
+            case "COSUSDT":
+                hitBTCPair[i] = "COS_USDT";
+                break;
+            case "TUSDBTUSD":
+                hitBTCPair[i] = "TUSDB_TUSD";
+                break;
+            case "NPXSUSDT":
+                hitBTCPair[i] = "NPXS_USDT";
+                break;
+            case "NPXSUSDC":
+                hitBTCPair[i] = "NPXS_USDC";
+                break;
+            case "COCOSBNB":
+                hitBTCPair[i] = "COCOS_BNB";
+                break;
+            case "COCOSBTC":
+                hitBTCPair[i] = "COCOS_BTC";
+                break;
+            case "COCOSUSDT":
+                hitBTCPair[i] = "COCOS_USDT";
+                break;
+            case "MTLUSDT":
+                hitBTCPair[i] = "MTL_USDT";
+                break;
+            case "TOMOBNB":
+                hitBTCPair[i] = "TOMO_BNB";
+                break;
+            case "TOMOBTC":
+                hitBTCPair[i] = "TOMO_BTC";
+                break;
+            case "TOMOUSDT":
+                hitBTCPair[i] = "TOMO_USDT";
+                break;
+            case "TOMOUSDC":
+                hitBTCPair[i] = "TOMO_USDC";
+                break;
+            case "PERLBNB":
+                hitBTCPair[i] = "PERL_BNB";
+                break;
+            case "PERLBTC":
+                hitBTCPair[i] = "PERL_BTC";
+                break;
+            case "PERLUSDC":
+                hitBTCPair[i] = "PERL_USDC";
+                break;
+            case "PERLUSDT":
+                hitBTCPair[i] = "PERL_USDT";
+                break;
+            case "DENTUSDT":
+                hitBTCPair[i] = "DENT_USDT";
+                break;
+            case "MFTUSDT":
+                hitBTCPair[i] = "MFT_USDT";
+                break;
+            case "KEYUSDT":
+                hitBTCPair[i] = "KEY_USDT";
+                break;
+            case "STORMUSDT":
+                hitBTCPair[i] = "STORM_USDT";
+                break;
+            case "DOCKUSDT":
+                hitBTCPair[i] = "DOCK_USDT";
+                break;
+            case "WANUSDT":
+                hitBTCPair[i] = "WAN_USDT";
+                break;
+            case "FUNUSDT":
+                hitBTCPair[i] = "FUN_USDT";
+                break;
+            case "CVCUSDT":
+                hitBTCPair[i] = "CVC_USDT";
+                break;
+            case "DASHHBCH":
+                hitBTCPair[i] = "DASH_BCH";
+            case "LAMBBTC":
+                hitBTCPair[i] = "LAMB_BTC";
+            case "LINKKUSD":
+                hitBTCPair[i] = "LINK_USD";
+
+
+        }
+    }
+
+    public static void normalizePoloniex(String str, int i) {
+
+        if (str.equals("BTC_EOS")) {
             poloniexPair[i] = "EOS_BTC";
         }
-        if(str.equals("ETH_EOS")){
+        if (str.equals("ETH_EOS")) {
             poloniexPair[i] = "EOS_ETH";
         }
 
