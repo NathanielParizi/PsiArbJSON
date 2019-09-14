@@ -156,6 +156,11 @@ public class MainActivity extends AppCompatActivity {
     private static BigDecimal[] bitZAsk = new BigDecimal[1000];
     private static BigDecimal[] bitZBid = new BigDecimal[1000];
 
+    static String[] liquidPair = new String[1000];
+    private static BigDecimal liquidAsk[] = new BigDecimal[1000];
+    private static BigDecimal liquidBid[] = new BigDecimal[1000];
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -772,24 +777,73 @@ public class MainActivity extends AppCompatActivity {
 
                 try {
                     JSONObject obj = (JSONObject) response.get("data");
+                    Log.d("BITZ", obj.toString());
 
-                    JSONObject bidObj = (JSONObject) obj.get("bidPrice");
                     Iterator keys = obj.keys();
                     String pair;
 
                     int i = 0;
-                    while (keys.hasNext()) {
 
 
+                    for (Iterator key = obj.keys(); key.hasNext(); ) {
+                        JSONObject innerObj = (JSONObject) obj.get((String) key.next());
 
-                        pair = (String) keys.next();
-                        pair.toUpperCase();
 
-                        Log.d("BITZset", " " + bidObj.toString() + " " + (String) keys.next() + " " + i);
+                        pair = (String) innerObj.get("symbol");
+                        pair = pair.toUpperCase();
+
+                        bitZPair[i] = pair;
+                        String bid = String.valueOf(innerObj.get("askPrice"));
+                        String ask = String.valueOf(innerObj.get("bidPrice"));
+                        bitZBid[i] = BigDecimal.valueOf(Double.parseDouble(bid));
+                        bitZAsk[i] = BigDecimal.valueOf(Double.parseDouble(ask));
+
+                        Log.d("BITZ", innerObj.get("symbol").toString() + " " + pair + " " + bitZPair[i] + " " + bitZAsk[i] + " " + bitZBid[i] + " " + i);
+
                         i++;
 
                     }
 
+
+                    if (bitZPair[0] != null) {
+                        List<String> list = new ArrayList<String>();
+
+                        for (String s : bitZPair) {
+                            if (s != null && s.length() > 0) {
+                                list.add(s);
+
+                            }
+                        }
+
+                        bitZPair = list.toArray(new String[list.size()]);
+                    }
+
+                    if (bitZAsk[0] != null) {
+                        List<BigDecimal> list = new ArrayList<>();
+
+                        for (BigDecimal b : bitZAsk) {
+                            if (b != null) {
+                                list.add(b);
+
+                            }
+                        }
+
+                        bitZAsk = list.toArray(new BigDecimal[list.size()]);
+
+                    }
+
+                    if (bitZBid[0] != null) {
+                        List<BigDecimal> list = new ArrayList<>();
+
+                        for (BigDecimal b : bitZBid) {
+                            if (b != null) {
+                                list.add(b);
+
+                            }
+                        }
+
+                        bitZBid = list.toArray(new BigDecimal[list.size()]);
+                    }
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -822,6 +876,8 @@ public class MainActivity extends AppCompatActivity {
         pairTokens = concatenate(pairTokens, poloniexPair);
         pairTokens = concatenate(pairTokens, bitMartPair);
         pairTokens = concatenate(pairTokens, hitBTCPair);
+        pairTokens = concatenate(pairTokens, bitZPair);
+
 
         bidTokens = concatenate(bidTokens, bitfinexxBid);
         bidTokens = concatenate(bidTokens, bittrexBid);
@@ -831,6 +887,7 @@ public class MainActivity extends AppCompatActivity {
         bidTokens = concatenate(bidTokens, poloniexBid);
         bidTokens = concatenate(bidTokens, bitmartBid);
         bidTokens = concatenate(bidTokens, hitBTCBid);
+        bidTokens = concatenate(bidTokens, bitZBid);
 
 
         askTokens = concatenate(askTokens, bitfinexAsk);
@@ -841,6 +898,7 @@ public class MainActivity extends AppCompatActivity {
         askTokens = concatenate(askTokens, poloniexAsk);
         askTokens = concatenate(askTokens, bitmartAsk);
         askTokens = concatenate(askTokens, hitBTCAsk);
+        askTokens = concatenate(askTokens, bitZAsk);
 
 
 //*****************************************************************
@@ -850,7 +908,8 @@ public class MainActivity extends AppCompatActivity {
                 && (!Arrays.asList(askTokens).subList(0, askTokens.length).contains(null))
                 && (!Arrays.asList(bidTokens).subList(0, bidTokens.length).contains(null))
                 && (bitfinexPair.length < 1000 && bittrexPair.length < 1000 && binancePair.length < 1000 && okexPair.length < 1000
-                && krakenPair.length < 1000 && poloniexPair.length < 1000 && bitMartPair.length < 1000 && hitBTCPair.length < 1000 && bitZPair.length < 1000)) {
+                && krakenPair.length < 1000 && poloniexPair.length < 1000 && bitMartPair.length < 1000 && hitBTCPair.length < 1000
+                && bitZPair.length < 1000 && bitZPair.length < 1000 && liquidPair.length < 1000)) {
 
 
             timer = 50000;
@@ -892,6 +951,11 @@ public class MainActivity extends AppCompatActivity {
             for (int i = market6; i < market7; i++) {
                 exchange[i] = "HitBTC";
             }
+            int market8 = bitfinexPair.length + bittrexPair.length + binancePair.length + okexPair.length + krakenPair.length + poloniexPair.length + bitMartPair.length + hitBTCPair.length + bitZPair.length;
+            for (int i = market7; i < market8; i++) {
+                exchange[i] = "BitZ";
+            }
+
             //
 
 
