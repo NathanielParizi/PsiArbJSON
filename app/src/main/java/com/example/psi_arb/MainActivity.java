@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
     static double profitTarget = 1;
     static String[] exchange;
 
-    private static int timer = 1500;
+    private static int timer = 5000;
     private static int[] chainIndex;
     private static ArrayList<String[]> arbChain = new ArrayList<>();
 
@@ -156,9 +156,9 @@ public class MainActivity extends AppCompatActivity {
     private static BigDecimal[] bitZAsk = new BigDecimal[1000];
     private static BigDecimal[] bitZBid = new BigDecimal[1000];
 
-    static String[] liquidPair = new String[1000];
-    private static BigDecimal liquidAsk[] = new BigDecimal[1000];
-    private static BigDecimal liquidBid[] = new BigDecimal[1000];
+    static String[] gateIOPair = new String[1000];
+    private static BigDecimal[] gateIOAsk = new BigDecimal[1000];
+    private static BigDecimal[] gateIOBid = new BigDecimal[1000];
 
 
     @Override
@@ -273,6 +273,10 @@ public class MainActivity extends AppCompatActivity {
 
                         //    Log.d("Items: ", jArr.getString(i));
 
+
+
+                        removeNullValues(bitfinexPair, bitfinexxBid, bitfinexAsk);
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -284,7 +288,7 @@ public class MainActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(), "ERROR at " + tempPair + " " + error.toString(), LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "ERROR parsing Bitfinex data", LENGTH_LONG).show();
 
             }
         });
@@ -297,35 +301,43 @@ public class MainActivity extends AppCompatActivity {
 
                 try {
 
-                    JSONArray metadataArr = response.getJSONArray("result");
 
-                    bittrexPair = new String[metadataArr.length()];
-                    bittrexAsk = new BigDecimal[metadataArr.length()];
-                    bittrexBid = new BigDecimal[metadataArr.length()];
+                    if (response.getJSONArray("result") != null) {
+                        JSONArray metadataArr = response.getJSONArray("result");
 
-                    for (int i = 0; i < metadataArr.length(); i++) {
+                        bittrexPair = new String[metadataArr.length()];
+                        bittrexAsk = new BigDecimal[metadataArr.length()];
+                        bittrexBid = new BigDecimal[metadataArr.length()];
 
-                        JSONObject obj = metadataArr.getJSONObject(i);
+                        for (int i = 0; i < metadataArr.length(); i++) {
 
-                        bittrexBid[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("Bid")));
-                        bittrexAsk[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("Ask")));
-                        bittrexVolume[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("BaseVolume")));
-                        //  bittrexPair[i] = obj.getString("MarketName");
+                            JSONObject obj = metadataArr.getJSONObject(i);
 
-                        String flip = obj.getString("MarketName");
-                        int flipInt = flip.indexOf("-");
-                        String base = flip.substring(0, flipInt);
-                        String quote = flip.substring(flipInt + 1);
-                        bittrexPair[i] = quote + "_" + base;
-                        Log.d("checkBittrex", bittrexPair[i] + "\t BASE:" + base + " QUOTE:" + quote);
+                            bittrexBid[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("Bid")));
+                            bittrexAsk[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("Ask")));
+                            bittrexVolume[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("BaseVolume")));
+                            //  bittrexPair[i] = obj.getString("MarketName");
 
-                        //Normalize data
-                        bittrexPair[i] = bittrexPair[i].replace("-", "_");
+                            String flip = obj.getString("MarketName");
+                            int flipInt = flip.indexOf("-");
+                            String base = flip.substring(0, flipInt);
+                            String quote = flip.substring(flipInt + 1);
+                            bittrexPair[i] = quote + "_" + base;
+                            Log.d("checkBittrex", bittrexPair[i] + "\t BASE:" + base + " QUOTE:" + quote);
 
-                        Log.d("BittrexSet", bittrexPair.length + " " + bittrexPair[i] + bittrexVolume[i].toString());
+                            //Normalize data
+                            bittrexPair[i] = bittrexPair[i].replace("-", "_");
+
+                            Log.d("BittrexSet", bittrexPair.length + " " + bittrexPair[i] + bittrexVolume[i].toString());
+
+                        }
+
+
 
                     }
 
+
+                    removeNullValues(bittrexPair, bittrexBid, bittrexAsk);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -340,6 +352,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
 
+                Toast.makeText(getApplicationContext(), "ERROR GATHER BITTREX DATA", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -347,7 +360,7 @@ public class MainActivity extends AppCompatActivity {
 
         URL = "https://api.binance.com/api/v3/ticker/bookTicker";
 
-        final JsonArrayRequest binanceFeed = new JsonArrayRequest(Request.Method.GET, URL, null, new Response.Listener<JSONArray>() {
+        JsonArrayRequest binanceFeed = new JsonArrayRequest(Request.Method.GET, URL, null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
 
@@ -394,6 +407,10 @@ public class MainActivity extends AppCompatActivity {
                     }
 
 
+
+                   removeNullValues(binancePair, binanceBid, binanceAsk);
+
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -402,6 +419,8 @@ public class MainActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+
+                Toast.makeText(getApplicationContext(), "ERROR GATHER Binance DATA", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -440,6 +459,9 @@ public class MainActivity extends AppCompatActivity {
 
                     }
 
+
+                    removeNullValues(okexPair, okexBid, okexAsk);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -448,6 +470,8 @@ public class MainActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+
+                Toast.makeText(getApplicationContext(), "ERROR GATHER OKEX DATA", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -546,6 +570,11 @@ public class MainActivity extends AppCompatActivity {
 
                     }
 
+
+
+                    removeNullValues(krakenPair, krakenBid, krakenAsk);
+
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -554,6 +583,8 @@ public class MainActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+
+                Toast.makeText(getApplicationContext(), "ERROR GATHER Kraken DATA", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -603,10 +634,53 @@ public class MainActivity extends AppCompatActivity {
                 }
 
 
+
+                if (poloniexPair[0] != null) {
+                    List<String> list = new ArrayList<String>();
+
+                    for (String s : poloniexPair) {
+                        if (s != null && s.length() > 0) {
+                            list.add(s);
+
+                        }
+                    }
+
+                    poloniexPair = list.toArray(new String[list.size()]);
+                }
+
+                if (poloniexAsk[0] != null) {
+                    List<BigDecimal> list = new ArrayList<>();
+
+                    for (BigDecimal b : poloniexAsk) {
+                        if (b != null) {
+                            list.add(b);
+
+                        }
+                    }
+
+                    poloniexAsk = list.toArray(new BigDecimal[list.size()]);
+
+                }
+
+                if (poloniexBid[0] != null) {
+                    List<BigDecimal> list = new ArrayList<>();
+
+                    for (BigDecimal b : poloniexBid) {
+                        if (b != null) {
+                            list.add(b);
+
+                        }
+                    }
+
+                    poloniexBid = list.toArray(new BigDecimal[list.size()]);
+                }
+
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+
+                Toast.makeText(getApplicationContext(), "ERROR GATHERING POLONIEX DATA", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -646,6 +720,48 @@ public class MainActivity extends AppCompatActivity {
 
                     }
 
+
+
+                    if (bitMartPair[0] != null) {
+                        List<String> list = new ArrayList<String>();
+
+                        for (String s : bitMartPair) {
+                            if (s != null && s.length() > 0) {
+                                list.add(s);
+
+                            }
+                        }
+
+                        bitMartPair = list.toArray(new String[list.size()]);
+                    }
+
+                    if (bitmartAsk[0] != null) {
+                        List<BigDecimal> list = new ArrayList<>();
+
+                        for (BigDecimal b : bitmartAsk) {
+                            if (b != null) {
+                                list.add(b);
+
+                            }
+                        }
+
+                        bitmartAsk = list.toArray(new BigDecimal[list.size()]);
+
+                    }
+
+                    if (bitmartBid[0] != null) {
+                        List<BigDecimal> list = new ArrayList<>();
+
+                        for (BigDecimal b : bitmartBid) {
+                            if (b != null) {
+                                list.add(b);
+
+                            }
+                        }
+
+                        bitmartBid = list.toArray(new BigDecimal[list.size()]);
+                    }
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -654,7 +770,7 @@ public class MainActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
+                Toast.makeText(getApplicationContext(), "ERROR GATHER BITMART DATA", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -662,7 +778,7 @@ public class MainActivity extends AppCompatActivity {
 
         URL = "https://api.hitbtc.com/api/2/public/ticker";
 
-        final JsonArrayRequest hitBTC = new JsonArrayRequest(Request.Method.GET, URL, null, new Response.Listener<JSONArray>() {
+        JsonArrayRequest hitBTC = new JsonArrayRequest(Request.Method.GET, URL, null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
 
@@ -779,7 +895,6 @@ public class MainActivity extends AppCompatActivity {
                     JSONObject obj = (JSONObject) response.get("data");
                     Log.d("BITZ", obj.toString());
 
-                    Iterator keys = obj.keys();
                     String pair;
 
                     int i = 0;
@@ -855,10 +970,125 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
 
+                Toast.makeText(getApplicationContext(), "ERROR GATHERING bitz DATA", Toast.LENGTH_SHORT).show();
+
             }
         });
 
         queue.add(bitZ);
+
+
+        URL = "https://data.gateio.co/api2/1/tickers";
+
+
+        JsonObjectRequest gateIO = new JsonObjectRequest(Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+                JSONObject obj = (JSONObject) response;
+
+
+                try {
+
+                    int i = 0;
+                    for (Iterator FUCKYOU = obj.keys(); FUCKYOU.hasNext(); ) {
+
+                        if (i < 210) {
+
+                            String FUCKstr = FUCKYOU.next().toString().toUpperCase();
+                            gateIOPair[i] = FUCKstr;
+                        } else {
+                            i = 0;
+                        }
+                        i++;
+                    }
+
+                    i = 0;
+
+                    for (Iterator keys = obj.keys(); keys.hasNext(); ) {
+
+                        if (i < 210) {
+
+                            JSONObject innerObj = (JSONObject) obj.get(String.valueOf(keys.next()));
+                            String bid = String.valueOf(innerObj.get("highestBid"));
+                            String ask = String.valueOf(innerObj.get("lowestAsk"));
+
+                            gateIOAsk[i] = BigDecimal.valueOf(Double.parseDouble(String.valueOf(ask)));
+                            gateIOBid[i] = BigDecimal.valueOf(Double.parseDouble(String.valueOf(bid)));
+
+                            // Log.d("GATEIOset")
+
+
+                        } else {
+                            i = 0;
+                        }
+
+                        i++;
+                    }
+
+
+                    if (gateIOPair[0] != null) {
+                        List<String> list = new ArrayList<String>();
+
+                        for (String s : gateIOPair) {
+                            if (s != null && s.length() > 0) {
+                                list.add(s);
+
+                            }
+                        }
+
+                        gateIOPair = list.toArray(new String[list.size()]);
+                    }
+
+                    if (gateIOAsk[0] != null) {
+                        List<BigDecimal> list = new ArrayList<>();
+
+                        for (BigDecimal b : gateIOAsk) {
+                            if (b != null) {
+                                list.add(b);
+
+                            }
+                        }
+
+                        gateIOAsk = list.toArray(new BigDecimal[list.size()]);
+
+                    }
+
+                    if (gateIOBid[0] != null) {
+                        List<BigDecimal> list = new ArrayList<>();
+
+                        for (BigDecimal b : gateIOBid) {
+                            if (b != null) {
+                                list.add(b);
+
+                            }
+                        }
+
+                        gateIOBid = list.toArray(new BigDecimal[list.size()]);
+                    }
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(), "Error gathering Gate.IO data", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        queue.add(gateIO);
+
+
+        for (int i = 0; i < gateIOPair.length; i++) {
+            Log.d("GATEIOset", "" + gateIOPair[i] + " \t" + gateIOAsk[i] + " "
+                    + "\t " + gateIOBid[i] + " : ");
+        }
 
         //******************************************************************** JSON Parsing Complete
         //
@@ -877,7 +1107,7 @@ public class MainActivity extends AppCompatActivity {
         pairTokens = concatenate(pairTokens, bitMartPair);
         pairTokens = concatenate(pairTokens, hitBTCPair);
         pairTokens = concatenate(pairTokens, bitZPair);
-
+        pairTokens = concatenate(pairTokens, gateIOPair);
 
         bidTokens = concatenate(bidTokens, bitfinexxBid);
         bidTokens = concatenate(bidTokens, bittrexBid);
@@ -888,7 +1118,7 @@ public class MainActivity extends AppCompatActivity {
         bidTokens = concatenate(bidTokens, bitmartBid);
         bidTokens = concatenate(bidTokens, hitBTCBid);
         bidTokens = concatenate(bidTokens, bitZBid);
-
+        bidTokens = concatenate(bidTokens, gateIOBid);
 
         askTokens = concatenate(askTokens, bitfinexAsk);
         askTokens = concatenate(askTokens, bittrexAsk);
@@ -899,7 +1129,7 @@ public class MainActivity extends AppCompatActivity {
         askTokens = concatenate(askTokens, bitmartAsk);
         askTokens = concatenate(askTokens, hitBTCAsk);
         askTokens = concatenate(askTokens, bitZAsk);
-
+        askTokens = concatenate(askTokens, gateIOAsk);
 
 //*****************************************************************
 
@@ -909,10 +1139,10 @@ public class MainActivity extends AppCompatActivity {
                 && (!Arrays.asList(bidTokens).subList(0, bidTokens.length).contains(null))
                 && (bitfinexPair.length < 1000 && bittrexPair.length < 1000 && binancePair.length < 1000 && okexPair.length < 1000
                 && krakenPair.length < 1000 && poloniexPair.length < 1000 && bitMartPair.length < 1000 && hitBTCPair.length < 1000
-                && bitZPair.length < 1000 && bitZPair.length < 1000 && liquidPair.length < 1000)) {
+                && bitZPair.length < 1000 && bitZPair.length < 1000 && gateIOPair.length < 1000)) {
 
 
-            timer = 50000;
+            timer = 70000;
             if (strBuilder != null) {
                 strBuilder.delete(0, strBuilder.length());
             }
@@ -955,7 +1185,10 @@ public class MainActivity extends AppCompatActivity {
             for (int i = market7; i < market8; i++) {
                 exchange[i] = "BitZ";
             }
-
+            int market9 = bitfinexPair.length + bittrexPair.length + binancePair.length + okexPair.length + krakenPair.length + poloniexPair.length + bitMartPair.length + hitBTCPair.length + bitZPair.length + gateIOPair.length;
+            for (int i = market8; i < market9; i++) {
+                exchange[i] = "GateIO";
+            }
             //
 
 
@@ -1040,8 +1273,8 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case "GBP":
                 return true;
-//            case "ETC":
-//                return true;
+            case "ETC":
+                return true;
             case "DASH":
                 return true;
             case "ZEC":
@@ -1184,7 +1417,7 @@ public class MainActivity extends AppCompatActivity {
 
                         //  arbChain.add(c1 + " " + c2 + " " + c3);
 
-                        timer = 50000;
+                        timer = 70000;
                         new LongOperation().execute();
 
 
@@ -1485,12 +1718,7 @@ public class MainActivity extends AppCompatActivity {
                         if (
                                 triArbitrage > 101 && triArbitrage != 0
 
-
-//                                        ( exchange[chainIndex[a]].equals("Poloniex")
-//                                        && exchange[chainIndex[b]].equals("Poloniex") ||
-//                                        exchange[chainIndex[a]].equals("Kraken")
-//                                                && exchange[chainIndex[b]].equals("Kraken"))
-
+                                    //    && exchange[chainIndex[a]].equals(exchange[chainIndex[b]])
 
                         ) {
 
@@ -1524,6 +1752,51 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+    public void removeNullValues(String[] pairs, BigDecimal[] bids, BigDecimal[] asks){
+
+
+        if (pairs[0] != null) {
+            List<String> list = new ArrayList<String>();
+
+            for (String s : pairs) {
+                if (s != null && s.length() > 0) {
+                    list.add(s);
+
+                }
+            }
+
+            pairs = list.toArray(new String[list.size()]);
+        }
+
+        if (bids[0] != null) {
+            List<BigDecimal> list = new ArrayList<>();
+
+            for (BigDecimal b : bids) {
+                if (b != null) {
+                    list.add(b);
+
+                }
+            }
+
+            bids = list.toArray(new BigDecimal[list.size()]);
+
+        }
+
+        if (asks[0] != null) {
+            List<BigDecimal> list = new ArrayList<>();
+
+            for (BigDecimal b : asks) {
+                if (b != null) {
+                    list.add(b);
+
+                }
+            }
+
+            asks = list.toArray(new BigDecimal[list.size()]);
+        }
+
+    }
 
     public <T> T[] concatenate(T[] a, T[] b) {
         int aLen = a.length;
