@@ -1,3 +1,5 @@
+
+
 package com.example.psi_arb;
 
 import android.os.AsyncTask;
@@ -49,7 +51,7 @@ import static com.example.psi_arb.NormalizePairs.normalizeHitBTC;
 //
 //
 //  Multipoint arbitrage expert system developed by Nathaniel-Joel Parizi.
-//  This algorithm will demonstrate automated order execution accross crypto-
+//  This algorithm will demonstrate automated order execution across crypto-
 //  exchanges in order to capture arbitrage profit between digital assets.
 //
 
@@ -99,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static StringBuilder strBuilder = new StringBuilder();
 
+
     static String c1;
     static String c2;
     static String c3;
@@ -109,6 +112,11 @@ public class MainActivity extends AppCompatActivity {
     static String c1Quote;
     static String c2Quote;
     static String c3Quote;
+
+    static String[] quickChainC1 = {};
+    static String[] quickChainC2 = {};
+    static String[] quickChainC3 = {};
+
 
     static int z = 0;
     private static int pairCounter = 0;
@@ -274,7 +282,6 @@ public class MainActivity extends AppCompatActivity {
                         //    Log.d("Items: ", jArr.getString(i));
 
 
-
                         removeNullValues(bitfinexPair, bitfinexxBid, bitfinexAsk);
 
                     } catch (JSONException e) {
@@ -331,7 +338,6 @@ public class MainActivity extends AppCompatActivity {
                             Log.d("BittrexSet", bittrexPair.length + " " + bittrexPair[i] + bittrexVolume[i].toString());
 
                         }
-
 
 
                     }
@@ -407,8 +413,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
 
-
-                   removeNullValues(binancePair, binanceBid, binanceAsk);
+                    removeNullValues(binancePair, binanceBid, binanceAsk);
 
 
                 } catch (JSONException e) {
@@ -571,7 +576,6 @@ public class MainActivity extends AppCompatActivity {
                     }
 
 
-
                     removeNullValues(krakenPair, krakenBid, krakenAsk);
 
 
@@ -632,7 +636,6 @@ public class MainActivity extends AppCompatActivity {
 
                     poloniexCounter++;
                 }
-
 
 
                 if (poloniexPair[0] != null) {
@@ -719,7 +722,6 @@ public class MainActivity extends AppCompatActivity {
 
 
                     }
-
 
 
                     if (bitMartPair[0] != null) {
@@ -1427,6 +1429,13 @@ public class MainActivity extends AppCompatActivity {
                         Log.d("CHAINS", "C1: [" + askTokens[chainIndex[a]] + "]\t C2:[" + askTokens[chainIndex[b]] + "]\t C3: [" + askTokens[chainIndex[c]]);
 
 
+                        quickChainC1[z] = pairTokens[chainIndex[a]];
+                        quickChainC2[z] = pairTokens[chainIndex[b]];
+                        quickChainC3[z] = pairTokens[chainIndex[c]];
+
+
+
+
                         // BID / ASK RATES for 3 pairs *****************
                         cd1b = bidTokens[chainIndex[a]];   // C1 Bid
                         cd1a = askTokens[chainIndex[a]];   // C1 Ask
@@ -1689,7 +1698,7 @@ public class MainActivity extends AppCompatActivity {
 
                         optimalPathText = (
 
-                                //CLOCKWISE
+                                //CLOCKWISE PATHS
 
                                 ((path == 1) ? " SELL: " + c1 + " " + " SELL: " + c2 + " " + " SELL: " + c3 : "")
                                         + ((path == 2) ? " SELL: " + c1 + " " + " SELL: " + c2 + " " + " BUY: " + c3 : "")
@@ -1700,7 +1709,7 @@ public class MainActivity extends AppCompatActivity {
                                         + ((path == 7) ? " BUY: " + c1 + " " + " BUY: " + c2 + " " + " SELL: " + c3 : "")
                                         + ((path == 8) ? " BUY: " + c1 + " " + " BUY: " + c2 + " " + " BUY: " + c3 : "")
 
-                                        //COUNTER-CLOCKWISE
+                                        //COUNTER-CLOCKWISE PATHS
 
                                         + ((path == 9) ? " SELL: " + c3 + " " + " SELL: " + c2 + " " + " SELL: " + c1 : "")
                                         + ((path == 10) ? " SELL: " + c3 + " " + " SELL: " + c2 + " " + " BUY: " + c1 : "")
@@ -1713,12 +1722,11 @@ public class MainActivity extends AppCompatActivity {
 
                         );
 
-                        //***********************************************************
+                        //*********************************************************** MARKET FILTER
 
                         if (
                                 triArbitrage > 101 && triArbitrage != 0
 
-                                    //    && exchange[chainIndex[a]].equals(exchange[chainIndex[b]])
 
                         ) {
 
@@ -1749,11 +1757,13 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        //================================
+
 
     }
 
 
-    public void removeNullValues(String[] pairs, BigDecimal[] bids, BigDecimal[] asks){
+    public void removeNullValues(String[] pairs, BigDecimal[] bids, BigDecimal[] asks) {
 
 
         if (pairs[0] != null) {
