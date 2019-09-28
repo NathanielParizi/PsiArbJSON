@@ -1,9 +1,8 @@
-
-
 package com.example.psi_arb;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.res.TypedArrayUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -51,7 +50,7 @@ import static com.example.psi_arb.NormalizePairs.normalizeHitBTC;
 //
 //
 //  Multipoint arbitrage expert system developed by Nathaniel-Joel Parizi.
-//  This algorithm will demonstrate automated order execution across crypto-
+//  This algorithm will demonstrate automated order execution accross crypto-
 //  exchanges in order to capture arbitrage profit between digital assets.
 //
 
@@ -77,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
     static double profitTarget = 1;
     static String[] exchange;
 
-    private static int timer = 5000;
+    private static int timer = 1500;
     private static int[] chainIndex;
     private static ArrayList<String[]> arbChain = new ArrayList<>();
 
@@ -101,7 +100,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static StringBuilder strBuilder = new StringBuilder();
 
-
     static String c1;
     static String c2;
     static String c3;
@@ -112,11 +110,6 @@ public class MainActivity extends AppCompatActivity {
     static String c1Quote;
     static String c2Quote;
     static String c3Quote;
-
-    static String[] quickChainC1 = {};
-    static String[] quickChainC2 = {};
-    static String[] quickChainC3 = {};
-
 
     static int z = 0;
     private static int pairCounter = 0;
@@ -282,7 +275,50 @@ public class MainActivity extends AppCompatActivity {
                         //    Log.d("Items: ", jArr.getString(i));
 
 
-                        removeNullValues(bitfinexPair, bitfinexxBid, bitfinexAsk);
+
+                        if (bitfinexPair[0] != null) {
+                            List<String> list = new ArrayList<String>();
+
+                            for (String s : bitfinexPair) {
+                                if (s != null && s.length() > 0) {
+                                    list.add(s);
+
+                                }
+                            }
+
+                            bitfinexPair = list.toArray(new String[list.size()]);
+                        }
+
+                        if (bitfinexAsk[0] != null) {
+                            List<BigDecimal> list = new ArrayList<>();
+
+                            for (BigDecimal b : bitfinexAsk) {
+                                if (b != null) {
+                                    list.add(b);
+
+                                }
+                            }
+
+                            bitfinexAsk = list.toArray(new BigDecimal[list.size()]);
+
+                        }
+
+                        if (bitfinexxBid[0] != null) {
+                            List<BigDecimal> list = new ArrayList<>();
+
+                            for (BigDecimal b : bitfinexxBid) {
+                                if (b != null) {
+                                    list.add(b);
+
+                                }
+                            }
+
+                            bitfinexxBid = list.toArray(new BigDecimal[list.size()]);
+                        }
+
+
+
+
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -318,32 +354,79 @@ public class MainActivity extends AppCompatActivity {
 
                         for (int i = 0; i < metadataArr.length(); i++) {
 
-                            JSONObject obj = metadataArr.getJSONObject(i);
+                            if (metadataArr.getJSONObject(i) != null) {
+                                JSONObject obj = metadataArr.getJSONObject(i);
 
-                            bittrexBid[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("Bid")));
-                            bittrexAsk[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("Ask")));
-                            bittrexVolume[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("BaseVolume")));
-                            //  bittrexPair[i] = obj.getString("MarketName");
 
-                            String flip = obj.getString("MarketName");
-                            int flipInt = flip.indexOf("-");
-                            String base = flip.substring(0, flipInt);
-                            String quote = flip.substring(flipInt + 1);
-                            bittrexPair[i] = quote + "_" + base;
-                            Log.d("checkBittrex", bittrexPair[i] + "\t BASE:" + base + " QUOTE:" + quote);
+                                try {
 
-                            //Normalize data
-                            bittrexPair[i] = bittrexPair[i].replace("-", "_");
+                                    if (!obj.getString("Bid").equals("null")) {
+                                        bittrexBid[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("Bid")));
+                                        bittrexAsk[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("Ask")));
+                                        bittrexVolume[i] = BigDecimal.valueOf(Double.parseDouble(obj.getString("BaseVolume")));
+                                        //  bittrexPair[i] = obj.getString("MarketName");
 
-                            Log.d("BittrexSet", bittrexPair.length + " " + bittrexPair[i] + bittrexVolume[i].toString());
+                                        String flip = obj.getString("MarketName");
+                                        int flipInt = flip.indexOf("-");
+                                        String base = flip.substring(0, flipInt);
+                                        String quote = flip.substring(flipInt + 1);
+                                        bittrexPair[i] = quote + "_" + base;
+                                        Log.d("checkBittrex", bittrexPair[i] + "\t BASE:" + base + " QUOTE:" + quote);
 
+                                        //Normalize data
+                                        bittrexPair[i] = bittrexPair[i].replace("-", "_");
+
+                                        Log.d("BittrexSet", bittrexPair.length + " " + bittrexPair[i] + bittrexVolume[i].toString());
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
                         }
-
-
                     }
 
 
-                    removeNullValues(bittrexPair, bittrexBid, bittrexAsk);
+                    if (bittrexPair[0] != null) {
+                        List<String> list = new ArrayList<String>();
+
+                        for (String s : bittrexPair) {
+                            if (s != null && s.length() > 0) {
+                                list.add(s);
+
+                            }
+                        }
+
+                        bittrexPair = list.toArray(new String[list.size()]);
+                    }
+
+                    if (bittrexBid[0] != null) {
+                        List<BigDecimal> list = new ArrayList<>();
+
+                        for (BigDecimal b : bittrexBid) {
+                            if (b != null) {
+                                list.add(b);
+
+                            }
+                        }
+
+                        bittrexBid = list.toArray(new BigDecimal[list.size()]);
+
+                    }
+
+                    if (bittrexAsk[0] != null) {
+                        List<BigDecimal> list = new ArrayList<>();
+
+                        for (BigDecimal b : bittrexAsk) {
+                            if (b != null) {
+                                list.add(b);
+
+                            }
+                        }
+
+                        bittrexAsk = list.toArray(new BigDecimal[list.size()]);
+                    }
+
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -413,7 +496,47 @@ public class MainActivity extends AppCompatActivity {
                     }
 
 
-                    removeNullValues(binancePair, binanceBid, binanceAsk);
+
+                    if (binancePair[0] != null) {
+                        List<String> list = new ArrayList<String>();
+
+                        for (String s : binancePair) {
+                            if (s != null && s.length() > 0) {
+                                list.add(s);
+
+                            }
+                        }
+
+                        binancePair = list.toArray(new String[list.size()]);
+                    }
+
+                    if (binanceAsk[0] != null) {
+                        List<BigDecimal> list = new ArrayList<>();
+
+                        for (BigDecimal b : binanceAsk) {
+                            if (b != null) {
+                                list.add(b);
+
+                            }
+                        }
+
+                        binanceAsk = list.toArray(new BigDecimal[list.size()]);
+
+                    }
+
+                    if (binanceBid[0] != null) {
+                        List<BigDecimal> list = new ArrayList<>();
+
+                        for (BigDecimal b : binanceBid) {
+                            if (b != null) {
+                                list.add(b);
+
+                            }
+                        }
+
+                        binanceBid = list.toArray(new BigDecimal[list.size()]);
+                    }
+
 
 
                 } catch (JSONException e) {
@@ -465,7 +588,47 @@ public class MainActivity extends AppCompatActivity {
                     }
 
 
-                    removeNullValues(okexPair, okexBid, okexAsk);
+
+                    if (okexPair[0] != null) {
+                        List<String> list = new ArrayList<String>();
+
+                        for (String s : okexPair) {
+                            if (s != null && s.length() > 0) {
+                                list.add(s);
+
+                            }
+                        }
+
+                        okexPair = list.toArray(new String[list.size()]);
+                    }
+
+                    if (okexBid[0] != null) {
+                        List<BigDecimal> list = new ArrayList<>();
+
+                        for (BigDecimal b : okexBid) {
+                            if (b != null) {
+                                list.add(b);
+
+                            }
+                        }
+
+                        okexBid = list.toArray(new BigDecimal[list.size()]);
+
+                    }
+
+                    if (okexAsk[0] != null) {
+                        List<BigDecimal> list = new ArrayList<>();
+
+                        for (BigDecimal b : okexAsk) {
+                            if (b != null) {
+                                list.add(b);
+
+                            }
+                        }
+
+                        okexAsk = list.toArray(new BigDecimal[list.size()]);
+                    }
+
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -576,7 +739,48 @@ public class MainActivity extends AppCompatActivity {
                     }
 
 
-                    removeNullValues(krakenPair, krakenBid, krakenAsk);
+
+                    if (krakenPair[0] != null) {
+                        List<String> list = new ArrayList<String>();
+
+                        for (String s : krakenPair) {
+                            if (s != null && s.length() > 0) {
+                                list.add(s);
+
+                            }
+                        }
+
+                        krakenPair = list.toArray(new String[list.size()]);
+                    }
+
+                    if (krakenAsk[0] != null) {
+                        List<BigDecimal> list = new ArrayList<>();
+
+                        for (BigDecimal b : krakenAsk) {
+                            if (b != null) {
+                                list.add(b);
+
+                            }
+                        }
+
+                        krakenAsk = list.toArray(new BigDecimal[list.size()]);
+
+                    }
+
+                    if (krakenBid[0] != null) {
+                        List<BigDecimal> list = new ArrayList<>();
+
+                        for (BigDecimal b : krakenBid) {
+                            if (b != null) {
+                                list.add(b);
+
+                            }
+                        }
+
+                        krakenBid = list.toArray(new BigDecimal[list.size()]);
+                    }
+
+
 
 
                 } catch (JSONException e) {
@@ -1100,6 +1304,7 @@ public class MainActivity extends AppCompatActivity {
         BigDecimal[] bidTokens = {};
         BigDecimal[] askTokens = {};
 
+
         pairTokens = concatenate(pairTokens, bitfinexPair);
         pairTokens = concatenate(pairTokens, bittrexPair);
         pairTokens = concatenate(pairTokens, binancePair);
@@ -1133,18 +1338,68 @@ public class MainActivity extends AppCompatActivity {
         askTokens = concatenate(askTokens, bitZAsk);
         askTokens = concatenate(askTokens, gateIOAsk);
 
+
+        if (pairTokens[0] != null) {
+            List<String> list = new ArrayList<String>();
+
+            for (String s : pairTokens) {
+                if (s != null && s.length() > 0) {
+                    list.add(s);
+
+                }
+            }
+
+            pairTokens = list.toArray(new String[list.size()]);
+        }
+
+        if (bidTokens[0] != null) {
+            List<BigDecimal> list = new ArrayList<>();
+
+            for (BigDecimal b : bidTokens) {
+                if (b != null) {
+                    list.add(b);
+
+                }
+            }
+
+            bidTokens = list.toArray(new BigDecimal[list.size()]);
+
+        }
+
+        if (askTokens[0] != null) {
+            List<BigDecimal> list = new ArrayList<>();
+
+            for (BigDecimal b : askTokens) {
+                if (b != null) {
+                    list.add(b);
+
+                }
+            }
+
+            askTokens = list.toArray(new BigDecimal[list.size()]);
+        }
+
+
 //*****************************************************************
 
 
-        if ((!Arrays.asList(pairTokens).subList(0, pairTokens.length).contains(null))
-                && (!Arrays.asList(askTokens).subList(0, askTokens.length).contains(null))
-                && (!Arrays.asList(bidTokens).subList(0, bidTokens.length).contains(null))
+
+        if (!Arrays.asList(pairTokens).subList(0, pairTokens.length).contains(null)
+                && !Arrays.asList(bidTokens).subList(0, bidTokens.length).contains(null)
+                && !Arrays.asList(askTokens).subList(0, askTokens.length).contains(null)
+
                 && (bitfinexPair.length < 1000 && bittrexPair.length < 1000 && binancePair.length < 1000 && okexPair.length < 1000
                 && krakenPair.length < 1000 && poloniexPair.length < 1000 && bitMartPair.length < 1000 && hitBTCPair.length < 1000
-                && bitZPair.length < 1000 && bitZPair.length < 1000 && gateIOPair.length < 1000)) {
+                && bitZPair.length < 1000 && gateIOPair.length < 1000)
+        ) {
 
 
-            timer = 70000;
+            for(String str : pairTokens){
+                Log.d("NEXTSPOT", str.toString() + pairTokens.length);
+
+            }
+
+            timer = 20000;
             if (strBuilder != null) {
                 strBuilder.delete(0, strBuilder.length());
             }
@@ -1189,6 +1444,9 @@ public class MainActivity extends AppCompatActivity {
             }
             int market9 = bitfinexPair.length + bittrexPair.length + binancePair.length + okexPair.length + krakenPair.length + poloniexPair.length + bitMartPair.length + hitBTCPair.length + bitZPair.length + gateIOPair.length;
             for (int i = market8; i < market9; i++) {
+
+                Log.d("NEXTSPOT", "PAIRTOKENS.lLENGTH" + pairTokens.length + "market 8-9" + market9 + " \t GateIOOPair.length: " + gateIOPair.length);
+
                 exchange[i] = "GateIO";
             }
             //
@@ -1226,6 +1484,32 @@ public class MainActivity extends AppCompatActivity {
 
         } else {
 
+            try {
+
+                for (String str : pairTokens) {
+                    Log.d("STOP", str + " " + pairTokens.length);
+                }
+//                for(BigDecimal bd : askTokens){
+//                    Log.d("STOPOASK", bd.toString() + " " + askTokens.length );
+//
+//
+//                }
+//                for(BigDecimal bd : bidTokens){
+//                    Log.d("STOPBID", bd.toString() + " " + " " + exchange[bidTokens.length]);
+//                }
+//                for (int i = 0; i < pairTokens.length; i++) {
+//
+//                    if (pairTokens[i].equals("null") || pairTokens[i] == null)
+//                        Log.d("WOW", pairTokens[i].toString() + "    i:  " + i + " " + pairTokens.length
+//                                + " " + pairTokens[i].toString() + " " + pairTokens[i].toString() + " ");
+////                Log.d("WOW", bitfinexPair.length + " " + bittrexPair.length + " " + binancePair.length +
+////                        " " + okexPair.length + " " + krakenPair.length + " " + poloniexPair.length + " " + bitMartPair.length
+////                + " " + hitBTCPair.length + " " + bitZPair.length + " " + gateIOPair.length);
+//                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             new LongOperation().execute();
         }
     }
@@ -1419,7 +1703,7 @@ public class MainActivity extends AppCompatActivity {
 
                         //  arbChain.add(c1 + " " + c2 + " " + c3);
 
-                        timer = 70000;
+                        timer = 20000;
                         new LongOperation().execute();
 
 
@@ -1427,13 +1711,6 @@ public class MainActivity extends AppCompatActivity {
                         Log.d("CHAINS", "C1: [" + pairTokens[chainIndex[a]] + "]\t C2: [" + pairTokens[chainIndex[b]] + "]\t C3: [" + pairTokens[chainIndex[c]]);//                        Log.d("ArbChain", "C1: [" + pairTokens[chainIndex[a]] + "]\t C2: [" + pairTokens[chainIndex[b]] + "]\t C3: [" + pairTokens[chainIndex[c]]);
                         Log.d("CHAINS", "C1: [" + bidTokens[chainIndex[a]] + "]\t C2: [" + bidTokens[chainIndex[b]] + "]\t C3: [" + bidTokens[chainIndex[c]]);
                         Log.d("CHAINS", "C1: [" + askTokens[chainIndex[a]] + "]\t C2:[" + askTokens[chainIndex[b]] + "]\t C3: [" + askTokens[chainIndex[c]]);
-
-
-                        quickChainC1[z] = pairTokens[chainIndex[a]];
-                        quickChainC2[z] = pairTokens[chainIndex[b]];
-                        quickChainC3[z] = pairTokens[chainIndex[c]];
-
-
 
 
                         // BID / ASK RATES for 3 pairs *****************
@@ -1698,7 +1975,7 @@ public class MainActivity extends AppCompatActivity {
 
                         optimalPathText = (
 
-                                //CLOCKWISE PATHS
+                                //CLOCKWISE
 
                                 ((path == 1) ? " SELL: " + c1 + " " + " SELL: " + c2 + " " + " SELL: " + c3 : "")
                                         + ((path == 2) ? " SELL: " + c1 + " " + " SELL: " + c2 + " " + " BUY: " + c3 : "")
@@ -1709,7 +1986,7 @@ public class MainActivity extends AppCompatActivity {
                                         + ((path == 7) ? " BUY: " + c1 + " " + " BUY: " + c2 + " " + " SELL: " + c3 : "")
                                         + ((path == 8) ? " BUY: " + c1 + " " + " BUY: " + c2 + " " + " BUY: " + c3 : "")
 
-                                        //COUNTER-CLOCKWISE PATHS
+                                        //COUNTER-CLOCKWISE
 
                                         + ((path == 9) ? " SELL: " + c3 + " " + " SELL: " + c2 + " " + " SELL: " + c1 : "")
                                         + ((path == 10) ? " SELL: " + c3 + " " + " SELL: " + c2 + " " + " BUY: " + c1 : "")
@@ -1722,11 +1999,12 @@ public class MainActivity extends AppCompatActivity {
 
                         );
 
-                        //*********************************************************** MARKET FILTER
+                        //***********************************************************
 
                         if (
                                 triArbitrage > 101 && triArbitrage != 0
 
+                            //    && exchange[chainIndex[a]].equals(exchange[chainIndex[b]])
 
                         ) {
 
@@ -1756,8 +2034,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-
-        //================================
 
 
     }
