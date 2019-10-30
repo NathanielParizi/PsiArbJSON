@@ -1,13 +1,21 @@
 package com.example.psi_arb;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v4.content.res.TypedArrayUtils;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,11 +26,17 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.psi_arb.Model.ListItem;
+import com.example.recyclerview2.Adapter.MyAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -35,6 +49,7 @@ import java.util.List;
 import java.util.Set;
 
 import static android.widget.Toast.LENGTH_LONG;
+import static android.widget.Toast.LENGTH_SHORT;
 import static com.example.psi_arb.NormalizePairs.normalize;
 import static com.example.psi_arb.NormalizePairs.normalizeHitBTC;
 
@@ -56,13 +71,10 @@ import static com.example.psi_arb.NormalizePairs.normalizeHitBTC;
 
 
 //*************************************************8 Reminders *************
-// Binance has no price data for TRIG coin!!! Don't divide by 0 on that!
-
+// Spreads are inaccurate
 
 public class MainActivity extends AppCompatActivity {
 
-    private static TextView exRate;
-    private static ScrollView scrollView;
 
     private static final String TAG = "";
     TextView text;
@@ -79,6 +91,10 @@ public class MainActivity extends AppCompatActivity {
     private static int timer = 1500;
     private static int[] chainIndex;
     private static ArrayList<String[]> arbChain = new ArrayList<>();
+
+
+    public static final String FILE_NAME = "psiArb.txt";
+
 
     public static BigDecimal cd1b = new BigDecimal(0);
     public static BigDecimal cd1a = new BigDecimal(0);
@@ -103,6 +119,11 @@ public class MainActivity extends AppCompatActivity {
     static String c1;
     static String c2;
     static String c3;
+
+    private static int q=0;
+
+    public static StringBuilder quickArbs = new StringBuilder();
+
 
     static String c1Base;
     static String c2Base;
@@ -161,22 +182,43 @@ public class MainActivity extends AppCompatActivity {
     private static BigDecimal[] gateIOAsk = new BigDecimal[1000];
     private static BigDecimal[] gateIOBid = new BigDecimal[1000];
 
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter adapter;
+    private ArrayList<ListItem> listItems;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        scrollView = (ScrollView) findViewById(R.id.scrollView);
-        exRate = (TextView) findViewById(R.id.rate);
-        exRate.setMovementMethod(new ScrollingMovementMethod());
-        exRate.setText("Loading Data Please Wait");
+
+        //  exRate = (TextView) findViewById(R.id.rate);
+//        exRate.setMovementMethod(new ScrollingMovementMethod());
+        ///      exRate.setText("Loading Data Please Wait");
         Toast.makeText(getApplicationContext(), "Loading Data Please Wait", LENGTH_LONG).show();
+
+        recyclerView = (RecyclerView) findViewById(R.id.rec);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        listItems = new ArrayList<>();
+
+        adapter = new MyAdapter(this, listItems);
+        recyclerView.setAdapter(adapter);
+
+        for (int i = 0; i < 400; i++) {
+            ListItem item = new ListItem("" + i, "OK ");
+            listItems.add(item);
+        }
+
 
         getCryptoPair();
         //   new LongOperation().execute();
 
     }
+
+    // LONG OPERATION ****************************************************************************************
 
     private class LongOperation extends AsyncTask<String, Void, String> {
 
@@ -186,8 +228,13 @@ public class MainActivity extends AppCompatActivity {
             try {
 
                 z = 0;
+
+
                 getCryptoPair();
+
                 Thread.sleep(timer);
+
+
 
             } catch (InterruptedException e) {
                 Thread.interrupted();
@@ -201,9 +248,9 @@ public class MainActivity extends AppCompatActivity {
 
 
             if (strBuilder != null) {
-                exRate.setText(strBuilder.toString());
+
             } else {
-                exRate.setText("Loading Data Please Wait");
+                //   exRate.setText("Loading Data Please Wait");
             }
 
         }
@@ -214,6 +261,10 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onProgressUpdate(Void... values) {
+
+            ListItem item = new ListItem("ArbPROFITC1", "OK ");
+            listItems.add(item);
+
         }
     }
 
@@ -248,6 +299,7 @@ public class MainActivity extends AppCompatActivity {
 
                 Log.d("Response: ", response.toString());
 
+
                 bitfinexPair = new String[417];
                 bitfinexAsk = new BigDecimal[417];
                 bitfinexxBid = new BigDecimal[417];
@@ -275,55 +327,51 @@ public class MainActivity extends AppCompatActivity {
                         //    Log.d("Items: ", jArr.getString(i));
 
 
-
-                        if (bitfinexPair[0] != null) {
-                            List<String> list = new ArrayList<String>();
-
-                            for (String s : bitfinexPair) {
-                                if (s != null && s.length() > 0) {
-                                    list.add(s);
-
-                                }
-                            }
-
-                            bitfinexPair = list.toArray(new String[list.size()]);
-                        }
-
-                        if (bitfinexAsk[0] != null) {
-                            List<BigDecimal> list = new ArrayList<>();
-
-                            for (BigDecimal b : bitfinexAsk) {
-                                if (b != null) {
-                                    list.add(b);
-
-                                }
-                            }
-
-                            bitfinexAsk = list.toArray(new BigDecimal[list.size()]);
-
-                        }
-
-                        if (bitfinexxBid[0] != null) {
-                            List<BigDecimal> list = new ArrayList<>();
-
-                            for (BigDecimal b : bitfinexxBid) {
-                                if (b != null) {
-                                    list.add(b);
-
-                                }
-                            }
-
-                            bitfinexxBid = list.toArray(new BigDecimal[list.size()]);
-                        }
-
-
-
-
-
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
 
+                }
+
+
+                if (bitfinexPair[0] != null) {
+                    List<String> list = new ArrayList<String>();
+
+                    for (String s : bitfinexPair) {
+                        if (s != null && s.length() > 0) {
+                            list.add(s);
+
+                        }
+                    }
+
+                    bitfinexPair = list.toArray(new String[list.size()]);
+                }
+
+                if (bitfinexAsk[0] != null) {
+                    List<BigDecimal> list = new ArrayList<>();
+
+                    for (BigDecimal b : bitfinexAsk) {
+                        if (b != null) {
+                            list.add(b);
+
+                        }
+                    }
+
+                    bitfinexAsk = list.toArray(new BigDecimal[list.size()]);
+
+                }
+
+                if (bitfinexxBid[0] != null) {
+                    List<BigDecimal> list = new ArrayList<>();
+
+                    for (BigDecimal b : bitfinexxBid) {
+                        if (b != null) {
+                            list.add(b);
+
+                        }
+                    }
+
+                    bitfinexxBid = list.toArray(new BigDecimal[list.size()]);
                 }
 
 
@@ -336,6 +384,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         queue.add(jsonArr_bitfinex);
+
 
         URL = "https://api.bittrex.com/api/v1.1/public/getmarketsummaries";
         JsonObjectRequest bittrexObject = new JsonObjectRequest(Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
@@ -441,7 +490,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                Toast.makeText(getApplicationContext(), "ERROR GATHER BITTREX DATA", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "ERROR GATHER BITTREX DATA", LENGTH_SHORT).show();
             }
         });
 
@@ -496,7 +545,6 @@ public class MainActivity extends AppCompatActivity {
                     }
 
 
-
                     if (binancePair[0] != null) {
                         List<String> list = new ArrayList<String>();
 
@@ -538,7 +586,6 @@ public class MainActivity extends AppCompatActivity {
                     }
 
 
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -548,7 +595,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                Toast.makeText(getApplicationContext(), "ERROR GATHER Binance DATA", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "ERROR GATHER Binance DATA", LENGTH_SHORT).show();
 
             }
         });
@@ -586,7 +633,6 @@ public class MainActivity extends AppCompatActivity {
                                 + okexAsk[i].toString() + " " + okexVolume[i].toString());
 
                     }
-
 
 
                     if (okexPair[0] != null) {
@@ -639,7 +685,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                Toast.makeText(getApplicationContext(), "ERROR GATHER OKEX DATA", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "ERROR GATHER OKEX DATA", LENGTH_SHORT).show();
 
             }
         });
@@ -739,7 +785,6 @@ public class MainActivity extends AppCompatActivity {
                     }
 
 
-
                     if (krakenPair[0] != null) {
                         List<String> list = new ArrayList<String>();
 
@@ -781,8 +826,6 @@ public class MainActivity extends AppCompatActivity {
                     }
 
 
-
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -792,7 +835,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                Toast.makeText(getApplicationContext(), "ERROR GATHER Kraken DATA", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "ERROR GATHER Kraken DATA", LENGTH_SHORT).show();
 
             }
         });
@@ -887,7 +930,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                Toast.makeText(getApplicationContext(), "ERROR GATHERING POLONIEX DATA", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "ERROR GATHERING POLONIEX DATA", LENGTH_SHORT).show();
 
             }
         });
@@ -976,7 +1019,7 @@ public class MainActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(), "ERROR GATHER BITMART DATA", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "ERROR GATHER BITMART DATA", LENGTH_SHORT).show();
             }
         });
 
@@ -1176,7 +1219,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                Toast.makeText(getApplicationContext(), "ERROR GATHERING bitz DATA", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "ERROR GATHERING bitz DATA", LENGTH_SHORT).show();
 
             }
         });
@@ -1284,7 +1327,7 @@ public class MainActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(), "Error gathering Gate.IO data", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Error gathering Gate.IO data", LENGTH_SHORT).show();
             }
         });
 
@@ -1383,7 +1426,6 @@ public class MainActivity extends AppCompatActivity {
 //*****************************************************************
 
 
-
         if (!Arrays.asList(pairTokens).subList(0, pairTokens.length).contains(null)
                 && !Arrays.asList(bidTokens).subList(0, bidTokens.length).contains(null)
                 && !Arrays.asList(askTokens).subList(0, askTokens.length).contains(null)
@@ -1394,12 +1436,12 @@ public class MainActivity extends AppCompatActivity {
         ) {
 
 
-            for(String str : pairTokens){
+            for (String str : pairTokens) {
                 Log.d("NEXTSPOT", str.toString() + pairTokens.length);
 
             }
 
-            timer = 20000;
+            timer = 40000;
             if (strBuilder != null) {
                 strBuilder.delete(0, strBuilder.length());
             }
@@ -1478,38 +1520,11 @@ public class MainActivity extends AppCompatActivity {
 
             }
 
-
             arbitrage(pairTokens, baseTokens, quoteTokens, bidTokens, askTokens);
 
 
         } else {
 
-            try {
-
-                for (String str : pairTokens) {
-                    Log.d("STOP", str + " " + pairTokens.length);
-                }
-//                for(BigDecimal bd : askTokens){
-//                    Log.d("STOPOASK", bd.toString() + " " + askTokens.length );
-//
-//
-//                }
-//                for(BigDecimal bd : bidTokens){
-//                    Log.d("STOPBID", bd.toString() + " " + " " + exchange[bidTokens.length]);
-//                }
-//                for (int i = 0; i < pairTokens.length; i++) {
-//
-//                    if (pairTokens[i].equals("null") || pairTokens[i] == null)
-//                        Log.d("WOW", pairTokens[i].toString() + "    i:  " + i + " " + pairTokens.length
-//                                + " " + pairTokens[i].toString() + " " + pairTokens[i].toString() + " ");
-////                Log.d("WOW", bitfinexPair.length + " " + bittrexPair.length + " " + binancePair.length +
-////                        " " + okexPair.length + " " + krakenPair.length + " " + poloniexPair.length + " " + bitMartPair.length
-////                + " " + hitBTCPair.length + " " + bitZPair.length + " " + gateIOPair.length);
-//                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
             new LongOperation().execute();
         }
     }
@@ -1703,7 +1718,7 @@ public class MainActivity extends AppCompatActivity {
 
                         //  arbChain.add(c1 + " " + c2 + " " + c3);
 
-                        timer = 20000;
+                        timer = 40000;
                         new LongOperation().execute();
 
 
@@ -2006,6 +2021,7 @@ public class MainActivity extends AppCompatActivity {
 
                             //    && exchange[chainIndex[a]].equals(exchange[chainIndex[b]])
 
+
                         ) {
 
 
@@ -2026,7 +2042,29 @@ public class MainActivity extends AppCompatActivity {
                             Log.d("ArbPROFIT", "C1: [" + bidTokens[chainIndex[a]] + "]\t C2: [" + bidTokens[chainIndex[b]] + "]\t C3: [" + bidTokens[chainIndex[c]] + "]");
                             Log.d("ArbPROFIT", String.valueOf(triArbitrage) + " \t PATH:" + path + "\n****");
 
+
+                            quickArbs.append(a + " " + b + " " + c + "\n");
+                            Log.d("GOLD", a + " " + b + " " + c);
+
+
+                            // Runnable method. Cannot update UI on background thread.
+                            Handler handler = new Handler(getApplicationContext().getMainLooper());
+
+                            handler.post(new Runnable() {
+                                public void run() {
+
+
+                                    ListItem itemGold = new ListItem(exchange[chainIndex[q]].toString(), "GOLD");
+                                    listItems.set(q, itemGold);
+                                    q++;
+
+                                }
+                            });
+
+
+
                         }
+
 
                     }
 
@@ -2035,6 +2073,34 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+
+    }
+
+
+    public void save(View view) {
+
+        String txt = quickArbs.toString();
+        FileOutputStream fos = null;
+
+        try {
+            fos = openFileOutput(FILE_NAME, MODE_PRIVATE);
+
+            fos.write(txt.getBytes());
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
     }
 
@@ -2105,4 +2171,47 @@ public class MainActivity extends AppCompatActivity {
         return b;
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case 1000:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(getApplicationContext(), "Permission granted", LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Permission denied", LENGTH_SHORT).show();
+                    finish();
+                }
+        }
+
+    }
+
+    private void saveTextAsFile(String filename, String content) {
+
+        String fileName = filename + ".txt";
+
+        //Create file
+        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), fileName);
+
+        //Output file
+
+        try {
+            FileOutputStream fos = new FileOutputStream(file);
+            fos = new FileOutputStream(file);
+            fos.write(content.getBytes());
+            fos.close();
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+
+
+        }
+
+
+    }
 }
