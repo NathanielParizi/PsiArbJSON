@@ -1240,12 +1240,12 @@ public class MainActivity extends AppCompatActivity {
                 try {
 
                     int i = 0;
-                    for (Iterator FUCKYOU = obj.keys(); FUCKYOU.hasNext(); ) {
+                    for (Iterator x = obj.keys(); x.hasNext(); ) {
 
                         if (i < 210) {
 
-                            String FUCKstr = FUCKYOU.next().toString().toUpperCase();
-                            gateIOPair[i] = FUCKstr;
+                            String xStr = x.next().toString().toUpperCase();
+                            gateIOPair[i] = xStr;
                         } else {
                             i = 0;
                         }
